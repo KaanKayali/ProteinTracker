@@ -1,0 +1,14 @@
+/* Custom Keypad active feedback */
+.key-btn:active {
+    transform: scale(0.95);
+}
+
+/* Hide scrollbars for slick look */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
