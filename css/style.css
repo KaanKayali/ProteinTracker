@@ -1,9 +1,14 @@
-/* Custom Keypad active feedback */
+/* Global theme variables */
+:root {
+    --brand-main: #9a80b2;
+}
+
+/* Keypad tactile feedback */
 .key-btn:active {
     transform: scale(0.95);
 }
 
-/* Hide scrollbars for slick look */
+/* Hide scrollbars across browsers */
 .no-scrollbar::-webkit-scrollbar {
     display: none;
 }

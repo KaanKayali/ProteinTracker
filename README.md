@@ -1,89 +1,56 @@
-# ProteinTracker Pro ⚡
+# ProteinTracker
 
-Eine moderne, leichtgewichtige Web-App zum schnellen und unkomplizierten Tracken der täglichen Proteinzufuhr – optimiert für Smartphone und Desktop.
+ProteinTracker is a lightweight, responsive client-side web application built for logging and monitoring daily protein consumption. It offers numeric logging, an on-screen keypad for touch devices, daily goal tracking, and a historical chart.
 
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
 ![Chart.js](https://img.shields.io/badge/Chart.js-FF6384?style=flat-square&logo=chartdotjs&logoColor=white)
 
----
+## Overview
 
-## ✨ Features
+The application runs entirely in the browser using static files. It requires no backend server or account authentication. State is persisted locally on the client using the browser's `localStorage` API.
 
-- **Schnelles Logging:** Direkte Zahleneingabe, Quick-Add-Buttons (+10g, +25g, +30g Shake, +50g) sowie ein integriertes Touch-Keypad für unterwegs.
-- **Fortschrittsanzeige:** Interaktiver Kreisring zur visuellen Verfolgung des täglichen Proteinziels.
-- **Verlauf & Historie:** Einzelne Einträge des Tages einsehen und bei Bedarf löschen.
-- **Tag beenden:** Schließt den Tag ab, archiviert das Gesamtergebnis und setzt den Zähler für den nächsten Tag zurück.
-- **Statistik-Dashboard:** 
-  - 7-Tage-Durchschnitt
-  - Allzeit-Rekord & Gesamtsumme
-  - Balken- und Liniendiagramme via Chart.js
-  - Historienübersicht aller abgeschlossenen Tage
-- **100% Client-Side:** Alle Daten werden lokal im Browser via `localStorage` gespeichert (kein Backend oder Login erforderlich).
-- **Responsive & Dark Mode:** Elegantes UI mit Tailwind CSS.
+## Features
 
----
+- **Fast Entry Logging**: Log intake via direct keyboard entry, quick-add preset buttons (+10g, +25g, +30g, +50g), or the built-in numeric touch keypad.
+- **Persistent Daily Goal**: Configure your daily target via the settings modal in the header. The value remains active until modified.
+- **Progress Tracking**: A dynamic radial progress ring provides immediate visual feedback against your daily target.
+- **Daily Entries Stream**: View, verify, and delete individual log entries for the current day.
+- **Day Archival**: Finalize and close out your daily log to store totals in your history and reset the current day's counter.
+- **Historical Analytics**: Review past intake with 7-day rolling averages, all-time record metrics, and interactive bar or line charts powered by Chart.js.
+- **Mobile-First Interface**: Designed with a compact layout to ensure keypad controls are directly accessible without unnecessary scrolling on mobile viewports.
 
-## 📁 Projektstruktur
+## Project Structure
 
 ```text
 ProteinTracker/
-├── index.html        # Haupt-HTML-Struktur
+├── assets/
+│   └── logo.png       Application icon and favicon
 ├── css/
-│   └── style.css     # Eigene CSS-Styles, Animationen & Utilities
+│   └── style.css      Custom styles and scrollbar overrides
 ├── js/
-│   └── app.js        # Gesamte App-Logik, State-Management & Charts
-├── .gitignore        # Ignorierte Dateien für Git
-└── README.md         # Projektdokumentation
+│   └── app.js         Core state management, event listeners, and chart logic
+├── .gitignore         Git ignore definitions
+├── index.html         Main HTML document and user interface
+└── README.md          Project documentation
 ```
 
----
+## Running the Application Locally
 
-## 🚀 Erste Schritte
+Since this is a static project, you can run it by opening `index.html` directly in any modern browser.
 
-### Lokal ausführen
-Einfach die [index.html](file:///c:/Development/ProteinTracker/index.html) in einem modernen Webbrowser öffnen oder einen lokalen Dev-Server starten (z. B. VS Code Live Server):
+Alternatively, you can start a local development server:
 
 ```bash
-# Mit Python (optional)
+# Using Python 3
 python -m http.server 8000
 
-# Mit Node.js npx (optional)
+# Using Node.js
 npx serve .
 ```
 
----
+Once running, navigate to `http://localhost:8000` in your web browser.
 
-## 📤 Auf GitHub hochladen
 
-Führe folgende Befehle im Projektverzeichnis aus:
 
-```bash
-# 1. Git Repository initialisieren
-git init
-
-# 2. Alle Dateien zum Commit hinzufügen
-git add .
-
-# 3. Ersten Commit erstellen
-git commit -m "Initial commit: Modularized ProteinTracker structure"
-
-# 4. Haupt-Branch auf main setzen
-git branch -M main
-
-# 5. Remote-Repository verknüpfen (Ersetze die URL mit deinem GitHub-Repo)
-git remote add origin https://github.com/DEIN-BENUTZERNAME/DEIN-REPO-NAME.git
-
-# 6. Auf GitHub pushen
-git push -u origin main
-```
-
----
-
-## 🌐 GitHub Pages Deployment
-
-Da es sich um eine statische Web-App handelt, kann sie direkt kostenlos über **GitHub Pages** bereitgestellt werden:
-1. Gehe in deinem GitHub-Repo auf **Settings** > **Pages**.
-2. Wähle unter **Branch** den Branch `main` und `/ (root)` aus.
-3. Klicke auf **Save**. Die App ist in wenigen Augenblicken live erreichbar!

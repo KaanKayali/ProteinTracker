@@ -1,14 +1,19 @@
 <!DOCTYPE html>
-<html lang="de" class="dark">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Protein Tracker Pro</title>
-    <!-- Google Fonts -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ProteinTracker</title>
+
+    <link rel="icon" type="image/png" href="assets/logo.png">
+    <link rel="apple-touch-icon" href="assets/logo.png">
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Tailwind CSS CDN -->
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -20,12 +25,16 @@
                     },
                     colors: {
                         brand: {
-                            50: '#eef2ff',
-                            100: '#e0e7ff',
-                            400: '#818cf8',
-                            500: '#6366f1',
-                            600: '#4f46e5',
-                            700: '#4338ca',
+                            50: '#f7f5f9',
+                            100: '#ede8f3',
+                            200: '#ded4e7',
+                            300: '#c8b6d7',
+                            400: '#b096c4',
+                            500: '#9a80b2',
+                            600: '#866b9f',
+                            700: '#715689',
+                            800: '#5e4871',
+                            900: '#4e3c5d',
                         },
                         emerald: {
                             400: '#34d399',
@@ -37,234 +46,262 @@
             }
         }
     </script>
-    <!-- FontAwesome Icons -->
+    <!-- Icons & Chart library -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Custom Styles -->
+
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-brand-500 selection:text-white">
 
-    <!-- Header Navbar -->
-    <header class="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-md border-b border-slate-800/80">
-        <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center shadow-lg shadow-brand-500/20">
-                    <i class="fa-solid font-bold text-white text-xl fa-bolt"></i>
-                </div>
-                <div>
-                    <h1 class="font-extrabold text-lg text-white tracking-tight leading-tight">ProteinTracker</h1>
-                    <p class="text-xs text-slate-400 font-medium">Daily Fitness Fuel</p>
+    <!-- Navigation bar -->
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800/80">
+        <div class="max-w-4xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between gap-2">
+            <!-- Brand header -->
+            <div class="flex items-center space-x-2 sm:space-x-3 min-w-0">
+                <img src="assets/logo.png" alt="ProteinTracker Logo" class="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow flex-shrink-0">
+                <div class="min-w-0">
+                    <div class="flex items-center gap-1.5">
+                        <h1 class="font-extrabold text-base sm:text-lg text-white tracking-tight leading-tight truncate">ProteinTracker</h1>
+                        <span class="text-[9px] sm:text-[10px] font-bold px-1.5 py-0.2 rounded bg-brand-500/20 text-brand-300 border border-brand-500/30">v1.0.0</span>
+                    </div>
+                    <p class="text-[10px] sm:text-xs text-brand-400 font-medium tracking-wide">@KaanKayali</p>
                 </div>
             </div>
 
-            <!-- View Switcher Tabs -->
-            <div class="flex p-1 bg-slate-800/90 rounded-xl border border-slate-700/50">
-                <button id="nav-tracker" onclick="switchTab('tracker')" class="flex items-center space-x-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 bg-brand-600 text-white shadow-sm">
-                    <i class="fa-solid fa-plus-circle"></i>
-                    <span>Tracker</span>
-                </button>
-                <button id="nav-stats" onclick="switchTab('stats')" class="flex items-center space-x-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all duration-200">
-                    <i class="fa-solid fa-chart-line"></i>
-                    <span>Statistik</span>
+            <!-- Tab switcher & goal modal button -->
+            <div class="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                <div class="flex p-0.5 sm:p-1 bg-slate-800/90 rounded-lg sm:rounded-xl border border-slate-700/50">
+                    <button id="nav-tracker" onclick="switchTab('tracker')" class="flex items-center space-x-1 sm:space-x-1.5 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-md sm:rounded-lg text-[11px] sm:text-xs font-semibold transition-all duration-200 bg-brand-600 text-white shadow-sm">
+                        <i class="fa-solid fa-plus-circle text-xs"></i>
+                        <span>Tracker</span>
+                    </button>
+                    <button id="nav-stats" onclick="switchTab('stats')" class="flex items-center space-x-1 sm:space-x-1.5 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-md sm:rounded-lg text-[11px] sm:text-xs font-semibold text-slate-400 hover:text-white transition-all duration-200">
+                        <i class="fa-solid fa-chart-line text-xs"></i>
+                        <span>Stats</span>
+                    </button>
+                </div>
+
+                <button onclick="openTargetModal()" title="Set Daily Goal" class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700/50 flex items-center justify-center text-slate-300 hover:text-brand-300 transition-all shadow-sm">
+                    <i class="fa-solid fa-gear text-xs sm:text-sm"></i>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Main App Container -->
-    <main class="flex-1 max-w-4xl w-full mx-auto p-4 md:p-6 space-y-6 pb-24 md:pb-8">
+    <!-- Main content container -->
+    <main class="flex-1 max-w-4xl w-full mx-auto p-3 sm:p-4 md:p-6 space-y-3 sm:space-y-5 pb-16 sm:pb-8">
 
-        <!-- ================= TRACKER VIEW ================= -->
-        <div id="view-tracker" class="space-y-6">
+        <!-- Tracker view -->
+        <div id="view-tracker" class="space-y-3 sm:space-y-5">
 
-            <!-- Today's Summary & Progress Card -->
-            <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-5 md:p-6 shadow-xl relative overflow-hidden">
+            <!-- Today's summary card -->
+            <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-3.5 sm:p-5 md:p-6 shadow-xl relative overflow-hidden">
                 <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-brand-600/10 rounded-full blur-3xl pointer-events-none"></div>
 
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
+                <div class="flex items-center justify-between gap-3">
+                    <div class="min-w-0">
                         <div class="flex items-center space-x-2">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-500/10 text-brand-400 border border-brand-500/20">
-                                Heute
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-brand-500/10 text-brand-400 border border-brand-500/20">
+                                Today
                             </span>
-                            <span id="current-date-display" class="text-xs text-slate-400 font-medium">--</span>
+                            <span id="current-date-display" class="text-[11px] sm:text-xs text-slate-400 font-medium truncate">--</span>
                         </div>
-                        <div class="mt-2 flex items-baseline space-x-2">
-                            <span id="today-total" class="text-5xl md:text-6xl font-black text-white tracking-tight">0</span>
-                            <span class="text-xl font-bold text-slate-400">g Protein</span>
+                        <div class="mt-1 flex items-baseline space-x-1.5 sm:space-x-2">
+                            <span id="today-total" class="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-none">0</span>
+                            <span class="text-sm sm:text-xl font-bold text-slate-400">g Protein</span>
                         </div>
-                        <p id="target-subtitle" class="text-xs text-slate-400 mt-1">Ziel: <span id="target-display-text">160</span>g / Tag</p>
+                        <p id="target-subtitle" class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Goal: <span id="target-display-text" class="font-bold text-brand-300">160</span>g / Day</p>
                     </div>
 
-                    <!-- Progress Ring & Quick Actions -->
-                    <div class="flex items-center justify-between md:justify-end gap-6 pt-3 md:pt-0 border-t border-slate-800 md:border-none">
-                        <!-- Circular Progress Visual -->
-                        <div class="relative w-20 h-20 flex-shrink-0">
+                    <div class="flex items-center gap-2.5 sm:gap-4 flex-shrink-0">
+                        <!-- Progress ring -->
+                        <div class="relative w-14 h-14 sm:w-20 sm:h-20 flex-shrink-0">
                             <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                                 <path class="text-slate-800" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                                 <path id="progress-circle" class="text-brand-500 transition-all duration-500 ease-out" stroke-dasharray="0, 100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                             </svg>
                             <div class="absolute inset-0 flex items-center justify-center flex-col">
-                                <span id="progress-percent" class="text-sm font-bold text-white">0%</span>
+                                <span id="progress-percent" class="text-xs sm:text-sm font-bold text-white">0%</span>
                             </div>
                         </div>
 
-                        <!-- Finish Day Action -->
-                        <button onclick="openFinishModal()" class="flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-95 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-900/30 transition-all">
-                            <i class="fa-solid fa-flag-checkered"></i>
-                            <span>Tag Beenden</span>
+                        <!-- Finish day button -->
+                        <button onclick="openFinishModal()" title="Finish Day" class="flex items-center space-x-1.5 px-3 py-2 sm:px-4 sm:py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-95 text-white text-[11px] sm:text-xs font-bold rounded-xl shadow-lg shadow-emerald-900/30 transition-all">
+                            <i class="fa-solid fa-flag-checkered text-xs"></i>
+                            <span>Finish</span>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Protein Logging Box (Desktop typing + On-screen calculator keypad) -->
-            <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-5 shadow-xl space-y-4">
+            <!-- Protein input box -->
+            <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-3.5 sm:p-5 shadow-xl space-y-2.5 sm:space-y-4">
                 <div class="flex items-center justify-between">
-                    <h2 class="text-sm font-bold text-slate-200 flex items-center gap-2">
+                    <h2 class="text-xs sm:text-sm font-bold text-slate-200 flex items-center gap-1.5 sm:gap-2">
                         <i class="fa-solid fa-utensils text-brand-400"></i>
-                        Protein Hinzufügen
+                        Add Protein
                     </h2>
-                    <button onclick="toggleKeypad()" id="keypad-toggle-btn" class="text-xs text-brand-400 hover:text-brand-300 flex items-center gap-1.5 md:hidden">
+                    <button onclick="toggleKeypad()" id="keypad-toggle-btn" class="text-[11px] sm:text-xs text-brand-400 hover:text-brand-300 flex items-center gap-1.5 md:hidden">
                         <i class="fa-solid fa-calculator"></i>
-                        <span id="keypad-toggle-text">Tastatur ausblenden</span>
+                        <span id="keypad-toggle-text">Hide Keypad</span>
                     </button>
                 </div>
 
-                <!-- Input Field & Add Button -->
+                <!-- Input field & submit button -->
                 <div class="flex gap-2">
                     <div class="relative flex-1">
-                        <input type="number" id="protein-input" placeholder="0" readonly md:readonly="false" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 rounded-xl px-4 py-3 text-2xl font-bold text-white placeholder-slate-600 outline-none transition-all pr-10">
-                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-500">Gramm</span>
+                        <input type="number" id="protein-input" placeholder="0" readonly md:readonly="false" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 rounded-xl px-3.5 py-2 sm:py-3 text-xl sm:text-2xl font-bold text-white placeholder-slate-600 outline-none transition-all pr-12">
+                        <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs sm:text-sm font-bold text-slate-500">Grams</span>
                     </div>
-                    <button onclick="submitProteinEntry()" class="bg-brand-600 hover:bg-brand-500 active:scale-95 text-white px-6 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-brand-600/30 transition-all min-w-[100px]">
-                        <i class="fa-solid fa-plus"></i>
+                    <button onclick="submitProteinEntry()" class="bg-brand-600 hover:bg-brand-500 active:scale-95 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-lg shadow-brand-600/30 transition-all min-w-[76px] sm:min-w-[100px]">
+                        <i class="fa-solid fa-plus text-xs sm:text-sm"></i>
                         <span>Add</span>
                     </button>
                 </div>
 
                 <!-- Quick add presets -->
-                <div class="flex gap-2 overflow-x-auto no-scrollbar py-1">
-                    <button onclick="quickAdd(10)" class="px-3 py-1.5 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 rounded-lg text-xs font-semibold text-slate-300 transition-all flex-shrink-0">+10g</button>
-                    <button onclick="quickAdd(25)" class="px-3 py-1.5 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 rounded-lg text-xs font-semibold text-slate-300 transition-all flex-shrink-0">+25g</button>
-                    <button onclick="quickAdd(30)" class="px-3 py-1.5 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 rounded-lg text-xs font-semibold text-slate-300 transition-all flex-shrink-0">+30g (Shake)</button>
-                    <button onclick="quickAdd(50)" class="px-3 py-1.5 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 rounded-lg text-xs font-semibold text-slate-300 transition-all flex-shrink-0">+50g</button>
+                <div class="flex gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-0.5">
+                    <button onclick="quickAdd(10)" class="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 rounded-lg text-[11px] sm:text-xs font-semibold text-slate-300 transition-all flex-shrink-0">+10g</button>
+                    <button onclick="quickAdd(25)" class="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 rounded-lg text-[11px] sm:text-xs font-semibold text-slate-300 transition-all flex-shrink-0">+25g</button>
+                    <button onclick="quickAdd(30)" class="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 rounded-lg text-[11px] sm:text-xs font-semibold text-slate-300 transition-all flex-shrink-0">+30g (Shake)</button>
+                    <button onclick="quickAdd(50)" class="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 rounded-lg text-[11px] sm:text-xs font-semibold text-slate-300 transition-all flex-shrink-0">+50g</button>
                 </div>
 
-                <!-- Calculator Style Numpad (Primary for mobile / narrow screen view) -->
-                <div id="calculator-keypad" class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-800/60">
-                    <button onclick="keypadPress('7')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-xl py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">7</button>
-                    <button onclick="keypadPress('8')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-xl py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">8</button>
-                    <button onclick="keypadPress('9')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-xl py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">9</button>
-                    <button onclick="keypadPress('4')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-xl py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">4</button>
-                    <button onclick="keypadPress('5')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-xl py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">5</button>
-                    <button onclick="keypadPress('6')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-xl py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">6</button>
-                    <button onclick="keypadPress('1')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-xl py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">1</button>
-                    <button onclick="keypadPress('2')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-xl py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">2</button>
-                    <button onclick="keypadPress('3')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-xl py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">3</button>
-                    <button onclick="keypadClear()" class="key-btn bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 font-bold text-sm py-3 rounded-xl border border-rose-500/30 transition-all flex items-center justify-center">C</button>
-                    <button onclick="keypadPress('0')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-xl py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">0</button>
-                    <button onclick="keypadBackspace()" class="key-btn bg-slate-800 text-slate-300 hover:bg-slate-700 font-bold text-sm py-3 rounded-xl border border-slate-700/50 transition-all flex items-center justify-center">
-                        <i class="fa-solid fa-backspace text-lg"></i>
+                <!-- On-screen numeric keypad -->
+                <div id="calculator-keypad" class="grid grid-cols-3 gap-1.5 sm:gap-2 pt-1.5 sm:pt-2 border-t border-slate-800/60">
+                    <button onclick="keypadPress('7')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-lg sm:text-xl py-2 sm:py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">7</button>
+                    <button onclick="keypadPress('8')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-lg sm:text-xl py-2 sm:py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">8</button>
+                    <button onclick="keypadPress('9')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-lg sm:text-xl py-2 sm:py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">9</button>
+                    <button onclick="keypadPress('4')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-lg sm:text-xl py-2 sm:py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">4</button>
+                    <button onclick="keypadPress('5')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-lg sm:text-xl py-2 sm:py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">5</button>
+                    <button onclick="keypadPress('6')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-lg sm:text-xl py-2 sm:py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">6</button>
+                    <button onclick="keypadPress('1')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-lg sm:text-xl py-2 sm:py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">1</button>
+                    <button onclick="keypadPress('2')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-lg sm:text-xl py-2 sm:py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">2</button>
+                    <button onclick="keypadPress('3')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-lg sm:text-xl py-2 sm:py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">3</button>
+                    <button onclick="keypadClear()" class="key-btn bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 font-bold text-sm sm:text-base py-2 sm:py-3 rounded-xl border border-rose-500/30 transition-all flex items-center justify-center">C</button>
+                    <button onclick="keypadPress('0')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-lg sm:text-xl py-2 sm:py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">0</button>
+                    <button onclick="keypadBackspace()" class="key-btn bg-slate-800 text-slate-300 hover:bg-slate-700 font-bold text-sm py-2 sm:py-3 rounded-xl border border-slate-700/50 transition-all flex items-center justify-center">
+                        <i class="fa-solid fa-backspace text-base sm:text-lg"></i>
                     </button>
                 </div>
             </div>
 
-            <!-- Today's Individual Log Stream -->
-            <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-5 shadow-xl space-y-4">
+            <!-- Entries log list -->
+            <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-3.5 sm:p-5 shadow-xl space-y-3">
                 <div class="flex items-center justify-between">
-                    <h2 class="text-sm font-bold text-slate-200 flex items-center gap-2">
+                    <h2 class="text-xs sm:text-sm font-bold text-slate-200 flex items-center gap-1.5 sm:gap-2">
                         <i class="fa-solid fa-clock-rotate-left text-brand-400"></i>
-                        Einträge von Heute
+                        Today's Entries
                     </h2>
-                    <span id="log-count" class="text-xs text-slate-400 bg-slate-800 px-2.5 py-1 rounded-full font-semibold">0 Einträge</span>
+                    <span id="log-count" class="text-[11px] sm:text-xs text-slate-400 bg-slate-800 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full font-semibold">0 Entries</span>
                 </div>
 
-                <div id="today-logs-container" class="space-y-2 max-h-60 overflow-y-auto pr-1">
-                    <!-- Dynamic Log Items Rendered Here -->
-                </div>
+                <div id="today-logs-container" class="space-y-2 max-h-56 sm:max-h-60 overflow-y-auto pr-1"></div>
             </div>
         </div>
 
-        <!-- ================= STATISTICS & CHART VIEW ================= -->
-        <div id="view-stats" class="space-y-6 hidden">
-            <!-- Analytics Summary Top Cards -->
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-4">
-                    <p class="text-xs text-slate-400 font-medium">Ø Täglich (7 Tage)</p>
-                    <p id="avg-7-days" class="text-2xl font-black text-white mt-1">0 g</p>
+        <!-- Statistics view -->
+        <div id="view-stats" class="space-y-4 sm:space-y-6 hidden">
+            <!-- Summary metrics -->
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-3">
+                <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-3 sm:p-4">
+                    <p class="text-[11px] sm:text-xs text-slate-400 font-medium">Daily Avg (7 Days)</p>
+                    <p id="avg-7-days" class="text-xl sm:text-2xl font-black text-white mt-1">0 g</p>
                 </div>
-                <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-4">
-                    <p class="text-xs text-slate-400 font-medium">Bester Tag</p>
-                    <p id="max-day-record" class="text-2xl font-black text-emerald-400 mt-1">0 g</p>
+                <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-3 sm:p-4">
+                    <p class="text-[11px] sm:text-xs text-slate-400 font-medium">Best Day</p>
+                    <p id="max-day-record" class="text-xl sm:text-2xl font-black text-emerald-400 mt-1">0 g</p>
                 </div>
-                <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-4 col-span-2 md:col-span-1">
-                    <p class="text-xs text-slate-400 font-medium">Absolutes Gesamttotal</p>
-                    <p id="total-all-time" class="text-2xl font-black text-brand-400 mt-1">0 g</p>
+                <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-3 sm:p-4 col-span-2 md:col-span-1">
+                    <p class="text-[11px] sm:text-xs text-slate-400 font-medium">All-Time Total</p>
+                    <p id="total-all-time" class="text-xl sm:text-2xl font-black text-brand-400 mt-1">0 g</p>
                 </div>
             </div>
 
-            <!-- Chart Options & Canvas Container -->
-            <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-5 shadow-xl space-y-4">
+            <!-- Chart card -->
+            <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-4 sm:p-5 shadow-xl space-y-3 sm:space-y-4">
                 <div class="flex flex-wrap items-center justify-between gap-2">
-                    <h2 class="text-sm font-bold text-slate-200 flex items-center gap-2">
+                    <h2 class="text-xs sm:text-sm font-bold text-slate-200 flex items-center gap-1.5 sm:gap-2">
                         <i class="fa-solid fa-chart-column text-brand-400"></i>
-                        Verlaufs-Diagramm
+                        Progress Chart
                     </h2>
                     <div class="flex items-center space-x-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
-                        <button onclick="setChartType('bar')" id="chart-btn-bar" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-brand-600 text-white">Balken</button>
-                        <button onclick="setChartType('line')" id="chart-btn-line" class="px-2.5 py-1 rounded-lg text-xs font-bold text-slate-400 hover:text-white">Linie</button>
+                        <button onclick="setChartType('bar')" id="chart-btn-bar" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-brand-600 text-white">Bar</button>
+                        <button onclick="setChartType('line')" id="chart-btn-line" class="px-2.5 py-1 rounded-lg text-xs font-bold text-slate-400 hover:text-white">Line</button>
                     </div>
                 </div>
 
-                <div class="relative h-64 md:h-80 w-full pt-2">
+                <div class="relative h-60 sm:h-64 md:h-80 w-full pt-1">
                     <canvas id="proteinChart"></canvas>
                 </div>
             </div>
 
-            <!-- Finished Days History List -->
-            <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-5 shadow-xl space-y-4">
+            <!-- History list card -->
+            <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-4 sm:p-5 shadow-xl space-y-3 sm:space-y-4">
                 <div class="flex items-center justify-between">
-                    <h2 class="text-sm font-bold text-slate-200 flex items-center gap-2">
+                    <h2 class="text-xs sm:text-sm font-bold text-slate-200 flex items-center gap-1.5 sm:gap-2">
                         <i class="fa-solid fa-calendar-check text-brand-400"></i>
-                        Abgeschlossene Tage
+                        Completed Days
                     </h2>
-                    <button onclick="confirmClearHistory()" class="text-xs text-rose-400 hover:text-rose-300 font-semibold">Historie löschen</button>
+                    <button onclick="confirmClearHistory()" class="text-xs text-rose-400 hover:text-rose-300 font-semibold">Clear History</button>
                 </div>
 
-                <div id="finished-days-list" class="space-y-2 max-h-72 overflow-y-auto pr-1">
-                    <!-- History List items -->
-                </div>
+                <div id="finished-days-list" class="space-y-2 max-h-72 overflow-y-auto pr-1"></div>
             </div>
         </div>
 
     </main>
 
-    <!-- Custom Modal: Finish Day Confirmation -->
+    <!-- Modal: Finish day confirmation -->
     <div id="finish-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-2xl animate-in fade-in zoom-in duration-200">
             <div class="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto text-xl">
                 <i class="fa-solid fa-flag-checkered"></i>
             </div>
             <div class="text-center space-y-1">
-                <h3 class="text-lg font-bold text-white">Tag jetzt beenden?</h3>
-                <p class="text-xs text-slate-400">Dein heutiges Gesamttotal von <span id="modal-protein-amount" class="text-white font-bold">0g</span> wird im Verlauf gespeichert und der Zähler für heute wird zurückgesetzt.</p>
+                <h3 class="text-lg font-bold text-white">Finish Day Now?</h3>
+                <p class="text-xs text-slate-400">Your total of <span id="modal-protein-amount" class="text-white font-bold">0g</span> will be saved to your history, and today's active counter will reset.</p>
             </div>
             <div class="flex gap-2 pt-2">
-                <button onclick="closeFinishModal()" class="flex-1 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition-all">Abbrechen</button>
-                <button onclick="confirmFinishDay()" class="flex-1 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-lg shadow-emerald-600/30 transition-all">Ja, Beenden</button>
+                <button onclick="closeFinishModal()" class="flex-1 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition-all">Cancel</button>
+                <button onclick="confirmFinishDay()" class="flex-1 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-lg shadow-emerald-600/30 transition-all">Yes, Finish</button>
             </div>
         </div>
     </div>
 
-    <!-- Custom Target Settings Floating Button -->
-    <button onclick="openTargetPrompt()" title="Tagesziel anpassen" class="fixed bottom-5 right-5 z-30 w-12 h-12 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-full flex items-center justify-center text-slate-300 hover:text-white shadow-xl transition-all">
-        <i class="fa-solid fa-bullseye text-lg"></i>
-    </button>
+    <!-- Modal: Target goal settings -->
+    <div id="target-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-2xl animate-in fade-in zoom-in duration-200">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-lg bg-brand-500/10 border border-brand-500/20 text-brand-400 flex items-center justify-center text-sm font-bold">
+                        <i class="fa-solid fa-bullseye"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-white">Daily Protein Goal</h3>
+                </div>
+                <button onclick="closeTargetModal()" class="text-slate-400 hover:text-white transition-colors">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
 
-    <!-- Main JavaScript Logic -->
+            <p class="text-xs text-slate-400">
+                Set your persistent daily target. This goal remains active across all upcoming days until you change it.
+            </p>
+
+            <form onsubmit="handleTargetFormSubmit(event)" class="space-y-3 pt-1">
+                <div class="relative">
+                    <input type="number" id="target-modal-input" min="1" max="1000" placeholder="e.g. 160" required class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 rounded-xl px-4 py-3 text-lg font-bold text-white placeholder-slate-600 outline-none transition-all pr-14">
+                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-500">g / Day</span>
+                </div>
+                <div class="flex gap-2 pt-1">
+                    <button type="button" onclick="closeTargetModal()" class="flex-1 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition-all">Cancel</button>
+                    <button type="submit" class="flex-1 px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold shadow-lg shadow-brand-600/30 transition-all">Save Goal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="js/app.js"></script>
 </body>
 </html>
