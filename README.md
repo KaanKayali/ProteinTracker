@@ -14,12 +14,13 @@ The application runs entirely in the browser using static files. It requires no 
 ## Features
 
 - **Fast Entry Logging**: Log intake via direct keyboard entry, quick-add preset buttons (+10g, +25g, +30g, +50g), or the built-in numeric touch keypad.
-- **Persistent Daily Goal**: Configure your daily target via the settings modal in the header. The value remains active until modified.
+- **Persistent Daily Goal**: Configure your daily target via the settings modal. The value remains active until modified.
+- **Day Rollover Protection**: Opening the app on a new calendar day never discards unfinalized protein logs. The app informs the user with an intuitive banner, allowing past logs to be archived to yesterday's history or carried into today's active total.
+- **Data Export & Import**: Backup and restore your complete tracking history as a portable JSON file directly from the settings panel.
 - **Progress Tracking**: A dynamic radial progress ring provides immediate visual feedback against your daily target.
 - **Daily Entries Stream**: View, verify, and delete individual log entries for the current day.
 - **Day Archival**: Finalize and close out your daily log to store totals in your history and reset the current day's counter.
 - **Historical Analytics**: Review past intake with 7-day rolling averages, all-time record metrics, and interactive bar or line charts powered by Chart.js.
-- **Mobile-First Interface**: Designed with a compact layout to ensure keypad controls are directly accessible without unnecessary scrolling on mobile viewports.
 
 ## Project Structure
 
@@ -32,6 +33,7 @@ ProteinTracker/
 ├── js/
 │   └── app.js         Core state management, event listeners, and chart logic
 ├── .gitignore         Git ignore definitions
+├── CHANGELOG.md       Version history and changes
 ├── index.html         Main HTML document and user interface
 └── README.md          Project documentation
 ```
@@ -52,5 +54,24 @@ npx serve .
 
 Once running, navigate to `http://localhost:8000` in your web browser.
 
+## Deployment to GitHub Pages
 
+To host the application using GitHub Pages:
 
+1. Commit and push your changes to your remote repository on GitHub:
+   ```bash
+   git add .
+   git commit -m "Release v1.1.0: responsive nav, day rollover safeguard, backup import/export"
+   git push origin main
+   ```
+
+2. Open your repository on GitHub in a web browser.
+3. Click on the **Settings** tab.
+4. In the left sidebar, navigate to the **Pages** section.
+5. Under **Build and deployment**:
+   - Source: **Deploy from a branch**
+   - Branch: Select `main` (or `master`) and leave the directory set to `/ (root)`.
+6. Click **Save**.
+
+GitHub Pages will build and deploy the application. Within a few moments, your site will be live at:
+`https://<username>.github.io/<repository-name>/`

@@ -2,6 +2,7 @@
 const LOCAL_LOGS_KEY = 'protein_tracker_logs_v1';
 const LOCAL_FINISHED_KEY = 'protein_tracker_finished_v1';
 const LOCAL_TARGET_KEY = 'protein_tracker_target_v1';
+const LOCAL_CURRENT_DATE_KEY = 'protein_tracker_active_date_v1';
 
 // App state
 let activeLogs = [];
@@ -9,6 +10,7 @@ let finishedDays = [];
 let dailyTarget = 160;
 let chartInstance = null;
 let activeChartType = 'bar';
+let activeWorkingDate = null;
 
 // Theme accent colors
 const BRAND_MAIN = '#9a80b2';
@@ -18,6 +20,7 @@ const BRAND_LIGHT = '#b096c4';
 // Boot up app once DOM is ready
 window.addEventListener('DOMContentLoaded', () => {
     loadStoredData();
+    checkDayTransition();
     updateCurrentDateHeader();
     renderDashboard();
     initChart();
@@ -33,13 +36,89 @@ function getTodayDateString() {
     return `${yyyy}-${mm}-${dd}`;
 }
 
-// Display formatted date string in header
+// Display formatted date string in header and banner
 function updateCurrentDateHeader() {
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     const todayStr = new Date().toLocaleDateString('en-US', options);
     const dateDisplay = document.getElementById('current-date-display');
     if (dateDisplay) {
         dateDisplay.innerText = todayStr;
+    }
+}
+
+// Handle transition if opening app on a new calendar day
+function checkDayTransition() {
+    const todayStr = getTodayDateString();
+    const banner = document.getElementById('day-rollover-banner');
+    const bannerText = document.getElementById('day-rollover-text');
+
+    if (!activeWorkingDate) {
+        activeWorkingDate = todayStr;
+        saveData();
+        return;
+    }
+
+    if (activeWorkingDate !== todayStr) {
+        // Find unfinalized logs from previous day(s)
+        const pastLogs = activeLogs.filter(log => log.dateString === activeWorkingDate);
+        const pastSum = pastLogs.reduce((sum, log) => sum + log.amount, 0);
+
+        if (pastLogs.length > 0 && pastSum > 0) {
+            if (banner && bannerText) {
+                bannerText.innerText = `New day started. You have ${pastSum}g unfinalized from ${activeWorkingDate}. Archive it to yesterday's history or continue tracking.`;
+                banner.classList.remove('hidden');
+            }
+        } else {
+            activeWorkingDate = todayStr;
+            saveData();
+        }
+    }
+}
+
+// User action from banner to archive prior day
+function archivePreviousDayFromBanner() {
+    if (!activeWorkingDate) return;
+    const pastLogs = activeLogs.filter(log => log.dateString === activeWorkingDate);
+
+    if (pastLogs.length > 0) {
+        const finishedEntry = {
+            dateString: activeWorkingDate,
+            logs: pastLogs.map(l => ({ id: l.id, timestamp: l.timestamp, amount: l.amount }))
+        };
+
+        finishedDays = finishedDays.filter(day => day.dateString !== activeWorkingDate);
+        finishedDays.unshift(finishedEntry);
+        activeLogs = activeLogs.filter(log => log.dateString !== activeWorkingDate);
+    }
+
+    activeWorkingDate = getTodayDateString();
+    saveData();
+    dismissDayRolloverBanner();
+    renderDashboard();
+    updateChart();
+}
+
+// User chooses to merge yesterday's entries into today
+function carryOverToTodayFromBanner() {
+    const todayStr = getTodayDateString();
+    activeLogs = activeLogs.map(log => {
+        if (log.dateString === activeWorkingDate) {
+            return { ...log, dateString: todayStr };
+        }
+        return log;
+    });
+
+    activeWorkingDate = todayStr;
+    saveData();
+    dismissDayRolloverBanner();
+    renderDashboard();
+    updateChart();
+}
+
+function dismissDayRolloverBanner() {
+    const banner = document.getElementById('day-rollover-banner');
+    if (banner) {
+        banner.classList.add('hidden');
     }
 }
 
@@ -56,10 +135,13 @@ function loadStoredData() {
         if (targetRaw) {
             dailyTarget = parseInt(targetRaw, 10) || 160;
         }
+
+        activeWorkingDate = localStorage.getItem(LOCAL_CURRENT_DATE_KEY) || getTodayDateString();
     } catch (err) {
         console.error('Failed to load local storage data:', err);
         activeLogs = [];
         finishedDays = [];
+        activeWorkingDate = getTodayDateString();
     }
 }
 
@@ -69,6 +151,9 @@ function saveData() {
         localStorage.setItem(LOCAL_LOGS_KEY, JSON.stringify(activeLogs));
         localStorage.setItem(LOCAL_FINISHED_KEY, JSON.stringify(finishedDays));
         localStorage.setItem(LOCAL_TARGET_KEY, dailyTarget.toString());
+        if (activeWorkingDate) {
+            localStorage.setItem(LOCAL_CURRENT_DATE_KEY, activeWorkingDate);
+        }
     } catch (err) {
         console.error('Failed to save to local storage:', err);
     }
@@ -128,7 +213,7 @@ function checkInputMode() {
     });
 }
 
-// Add new entry for today
+// Add new entry
 function submitProteinEntry() {
     const input = document.getElementById('protein-input');
     if (!input) return;
@@ -138,11 +223,14 @@ function submitProteinEntry() {
         return;
     }
 
+    const todayStr = getTodayDateString();
+    activeWorkingDate = todayStr;
+
     const now = new Date();
     const newEntry = {
         id: 'log_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
         timestamp: now.toISOString(),
-        dateString: getTodayDateString(),
+        dateString: todayStr,
         amount: amount
     };
 
@@ -162,11 +250,21 @@ function deleteLogEntry(id) {
     updateChart();
 }
 
-// Sum of grams recorded today
+// Calculate sum of logs for a finished day entry
+function getFinishedDayAmount(dayItem) {
+    if (!dayItem) return 0;
+    if (Array.isArray(dayItem.logs) && dayItem.logs.length > 0) {
+        return dayItem.logs.reduce((sum, log) => sum + (Number(log.amount) || 0), 0);
+    }
+    // Backward compatibility for earlier records
+    return Number(dayItem.totalAmount) || 0;
+}
+
+// Sum of grams currently active (today + unfinalized)
 function getTodayTotal() {
     const todayStr = getTodayDateString();
     return activeLogs
-        .filter(log => log.dateString === todayStr)
+        .filter(log => log.dateString === todayStr || log.dateString === activeWorkingDate)
         .reduce((sum, log) => sum + log.amount, 0);
 }
 
@@ -174,7 +272,7 @@ function getTodayTotal() {
 function renderDashboard() {
     const todayTotal = getTodayTotal();
     const todayStr = getTodayDateString();
-    const todayLogs = activeLogs.filter(log => log.dateString === todayStr);
+    const displayLogs = activeLogs.filter(log => log.dateString === todayStr || log.dateString === activeWorkingDate);
 
     // Summary totals and target
     const todayTotalEl = document.getElementById('today-total');
@@ -194,10 +292,10 @@ function renderDashboard() {
     // Log list container
     const container = document.getElementById('today-logs-container');
     const logCountEl = document.getElementById('log-count');
-    if (logCountEl) logCountEl.innerText = `${todayLogs.length} ${todayLogs.length === 1 ? 'Entry' : 'Entries'}`;
+    if (logCountEl) logCountEl.innerText = `${displayLogs.length} ${displayLogs.length === 1 ? 'Entry' : 'Entries'}`;
 
     if (container) {
-        if (todayLogs.length === 0) {
+        if (displayLogs.length === 0) {
             container.innerHTML = `
                 <div class="text-center py-6 text-slate-500 border border-dashed border-slate-800 rounded-xl">
                     <i class="fa-solid fa-cookie-bite text-2xl mb-1 opacity-40"></i>
@@ -205,7 +303,7 @@ function renderDashboard() {
                 </div>
             `;
         } else {
-            container.innerHTML = todayLogs.map(log => {
+            container.innerHTML = displayLogs.map(log => {
                 const timeStr = new Date(log.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
                 return `
                     <div class="flex items-center justify-between p-3 bg-slate-950/60 border border-slate-800/80 rounded-xl hover:border-slate-700 transition-all">
@@ -245,107 +343,69 @@ function closeFinishModal() {
 }
 
 function confirmFinishDay() {
-    const todayStr = getTodayDateString();
-    const todayLogs = activeLogs.filter(log => log.dateString === todayStr);
-    const total = todayLogs.reduce((sum, log) => sum + log.amount, 0);
+    const targetDate = activeWorkingDate || getTodayDateString();
+    const dayLogs = activeLogs.filter(log => log.dateString === targetDate);
 
+    // Save only the individual values and timestamp
     const finishedEntry = {
-        dateString: todayStr,
-        totalAmount: total,
-        logsCount: todayLogs.length,
-        finishedAt: new Date().toISOString()
+        dateString: targetDate,
+        finishedAt: new Date().toISOString(),
+        logs: dayLogs.map(l => ({ id: l.id, timestamp: l.timestamp, amount: l.amount }))
     };
 
-    // If day was already archived earlier today, replace it
-    finishedDays = finishedDays.filter(day => day.dateString !== todayStr);
+    // Replace if this date was previously finalized, else prepend
+    finishedDays = finishedDays.filter(day => day.dateString !== targetDate);
     finishedDays.unshift(finishedEntry);
 
-    // Reset today's active entries
-    activeLogs = activeLogs.filter(log => log.dateString !== todayStr);
+    // Clear active logs for finalized date
+    activeLogs = activeLogs.filter(log => log.dateString !== targetDate);
+
+    // Advance working date to today
+    activeWorkingDate = getTodayDateString();
 
     saveData();
     closeFinishModal();
+    dismissDayRolloverBanner();
     renderDashboard();
     updateChart();
 }
 
-// Summary cards & history list
+// Summary cards metrics
 function renderStatsSummary() {
-    const historyList = document.getElementById('finished-days-list');
-
-    if (historyList) {
-        if (finishedDays.length === 0) {
-            historyList.innerHTML = `
-                <div class="text-center py-6 text-slate-500 border border-dashed border-slate-800 rounded-xl">
-                    <p class="text-xs">No completed days yet.</p>
-                </div>
-            `;
-        } else {
-            historyList.innerHTML = finishedDays.map(item => {
-                const dateFormatted = new Date(item.dateString + 'T00:00:00').toLocaleDateString('en-US', {
-                    weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
-                });
-                const targetMet = item.totalAmount >= dailyTarget;
-
-                return `
-                    <div class="flex items-center justify-between p-3 bg-slate-950/60 border border-slate-800/80 rounded-xl">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-8 h-8 rounded-lg ${targetMet ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400' : 'bg-amber-500/10 border border-amber-500/20 text-amber-400'} flex items-center justify-center font-bold text-xs">
-                                <i class="fa-solid ${targetMet ? 'fa-check' : 'fa-minus'}"></i>
-                            </div>
-                            <div>
-                                <p class="text-xs font-bold text-white">${dateFormatted}</p>
-                                <p class="text-[10px] text-slate-400">${item.logsCount} ${item.logsCount === 1 ? 'entry' : 'entries'}</p>
-                            </div>
-                        </div>
-                        <span class="text-sm font-black text-white">${item.totalAmount}g</span>
-                    </div>
-                `;
-            }).join('');
-        }
-    }
-
-    // Historical calculations
-    const totals = finishedDays.map(d => d.totalAmount);
-    const totalAllTime = totals.reduce((a, b) => a + b, 0) + getTodayTotal();
-    const maxRecord = totals.length > 0 ? Math.max(...totals, getTodayTotal()) : getTodayTotal();
+    const finishedTotals = finishedDays.map(d => getFinishedDayAmount(d));
+    const totalAllTime = finishedTotals.reduce((a, b) => a + b, 0) + getTodayTotal();
+    const maxRecord = finishedTotals.length > 0 ? Math.max(...finishedTotals) : 0;
     
-    const last7Days = finishedDays.slice(0, 7);
-    const avg7 = last7Days.length > 0 ? Math.round(last7Days.reduce((a, b) => a + b.totalAmount, 0) / last7Days.length) : getTodayTotal();
+    // Average across finished days
+    const avgFinished = finishedTotals.length > 0 ? Math.round(finishedTotals.reduce((a, b) => a + b, 0) / finishedTotals.length) : 0;
 
-    const avg7El = document.getElementById('avg-7-days');
+    const avgEl = document.getElementById('avg-7-days');
     const maxRecordEl = document.getElementById('max-day-record');
     const totalAllTimeEl = document.getElementById('total-all-time');
 
-    if (avg7El) avg7El.innerText = `${avg7} g`;
+    if (avgEl) avgEl.innerText = `${avgFinished} g`;
     if (maxRecordEl) maxRecordEl.innerText = `${maxRecord} g`;
     if (totalAllTimeEl) totalAllTimeEl.innerText = `${totalAllTime} g`;
 }
 
-// Prepare dataset for Chart.js
+// Prepare dataset for Chart.js across all finished days
 function getAggregatedChartData() {
+    // Map dateString -> total calculated on the fly
     const map = {};
 
     finishedDays.forEach(d => {
-        map[d.dateString] = (map[d.dateString] || 0) + d.totalAmount;
+        map[d.dateString] = getFinishedDayAmount(d);
     });
 
-    const todayStr = getTodayDateString();
-    const todayActiveTotal = getTodayTotal();
-    if (todayActiveTotal > 0 || !map[todayStr]) {
-        map[todayStr] = todayActiveTotal;
-    }
+    // Sort all dates chronologically
+    const sortedDates = Object.keys(map).sort();
 
-    // Take last 14 entries
-    const dates = Object.keys(map).sort();
-    const recentDates = dates.slice(-14);
-
-    const labels = recentDates.map(d => {
+    const labels = sortedDates.map(d => {
         const dateObj = new Date(d + 'T00:00:00');
         return dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     });
 
-    const data = recentDates.map(d => map[d]);
+    const data = sortedDates.map(d => map[d]);
 
     return { labels, data };
 }
@@ -361,16 +421,16 @@ function initChart() {
         data: {
             labels: labels,
             datasets: [{
-                label: 'Protein (g)',
+                label: 'Finished Protein (g)',
                 data: data,
-                backgroundColor: 'rgba(154, 128, 178, 0.35)',
+                backgroundColor: 'rgba(154, 128, 178, 0.4)',
                 borderColor: BRAND_MAIN,
                 borderWidth: 2,
                 borderRadius: 8,
-                tension: 0.3,
+                tension: 0.25,
                 fill: true,
                 pointBackgroundColor: BRAND_LIGHT,
-                pointRadius: 4
+                pointRadius: 5
             }]
         },
         options: {
@@ -387,7 +447,7 @@ function initChart() {
                     padding: 10,
                     displayColors: false,
                     callbacks: {
-                        label: (context) => `${context.parsed.y} g Protein`
+                        label: (context) => `${context.parsed.y} g Protein finalized`
                     }
                 }
             },
@@ -444,6 +504,7 @@ function switchTab(tab) {
         statsTab.classList.remove('hidden');
         btnStats.className = 'flex items-center space-x-1 sm:space-x-1.5 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-md sm:rounded-lg text-[11px] sm:text-xs font-semibold transition-all duration-200 bg-brand-600 text-white shadow-sm';
         btnTracker.className = 'flex items-center space-x-1 sm:space-x-1.5 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-md sm:rounded-lg text-[11px] sm:text-xs font-semibold text-slate-400 hover:text-white transition-all duration-200';
+        renderStatsSummary();
         updateChart();
     }
 }
@@ -488,6 +549,88 @@ function handleTargetFormSubmit(event) {
     } else {
         alert('Please enter a valid target greater than 0.');
     }
+}
+
+// Export data backup to a JSON file
+function exportDataBackup() {
+    const backupData = {
+        version: '1.1.0',
+        exportedAt: new Date().toISOString(),
+        dailyTarget: dailyTarget,
+        activeWorkingDate: activeWorkingDate,
+        activeLogs: activeLogs,
+        finishedDays: finishedDays
+    };
+
+    const jsonString = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(backupData, null, 2));
+    const downloadAnchor = document.createElement('a');
+    const dateFormatted = getTodayDateString();
+    downloadAnchor.setAttribute('href', jsonString);
+    downloadAnchor.setAttribute('download', `proteintracker-backup-${dateFormatted}.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+}
+
+// Import data backup from JSON file
+function triggerImportFileInput() {
+    const fileInput = document.getElementById('import-file-input');
+    if (fileInput) {
+        fileInput.value = '';
+        fileInput.click();
+    }
+}
+
+function handleImportFile(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+
+            if (!data || (typeof data !== 'object')) {
+                throw new Error('Invalid backup format');
+            }
+
+            if (confirm('Importing this file will merge its records with your existing data. Do you want to proceed?')) {
+                if (typeof data.dailyTarget === 'number' && data.dailyTarget > 0) {
+                    dailyTarget = data.dailyTarget;
+                }
+
+                if (Array.isArray(data.finishedDays)) {
+                    const existingMap = new Map();
+                    finishedDays.forEach(day => existingMap.set(day.dateString, day));
+                    data.finishedDays.forEach(day => {
+                        if (day && day.dateString) {
+                            existingMap.set(day.dateString, day);
+                        }
+                    });
+                    finishedDays = Array.from(existingMap.values()).sort((a, b) => b.dateString.localeCompare(a.dateString));
+                }
+
+                if (Array.isArray(data.activeLogs)) {
+                    const existingLogIds = new Set(activeLogs.map(l => l.id));
+                    data.activeLogs.forEach(log => {
+                        if (log && log.id && !existingLogIds.has(log.id)) {
+                            activeLogs.push(log);
+                        }
+                    });
+                }
+
+                saveData();
+                closeTargetModal();
+                renderDashboard();
+                updateChart();
+                alert('Backup successfully imported.');
+            }
+        } catch (err) {
+            console.error('Import error:', err);
+            alert('Failed to read backup file. Please ensure it is a valid ProteinTracker JSON file.');
+        }
+    };
+    reader.readAsText(file);
 }
 
 // Delete history with prompt
