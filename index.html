@@ -2,7 +2,7 @@
 <html lang="de" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>ProteinTracker</title>
 
     <!-- Transparent logo for favicon and in-app display -->
@@ -15,12 +15,12 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ProteinTracker">
 
-    <!-- Fonts -->
+    <!-- Global Modern Typography: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -35,7 +35,7 @@
                 },
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
+                        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
                     },
                     colors: {
                         brand: {
@@ -49,6 +49,26 @@
                             700: '#715689',
                             800: '#5e4871',
                             900: '#4e3c5d',
+                        },
+                        // Custom refined neutral dark and light grays
+                        dark: {
+                            bg: '#121316',
+                            card: '#181a1f',
+                            cardAlt: '#1e2126',
+                            border: '#2a2e35',
+                            borderHover: '#383e47',
+                            input: '#15171b',
+                            textMuted: '#949ba4',
+                        },
+                        light: {
+                            bg: '#dbe0e8',
+                            card: '#edf0f5',
+                            cardAlt: '#e2e6ed',
+                            border: '#c4cdd8',
+                            borderHover: '#a8b4c2',
+                            input: '#f7f9fb',
+                            text: '#0f172a',
+                            textMuted: '#475569',
                         },
                         emerald: {
                             400: '#34d399',
@@ -66,183 +86,208 @@
 
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-brand-500 selection:text-white">
+<body class="bg-dark-bg text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-brand-500 selection:text-white transition-colors duration-200">
 
-    <!-- Navigation bar -->
-    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800/80">
-        <div class="max-w-4xl mx-auto px-2.5 sm:px-4 py-2 sm:py-3 flex items-center justify-between gap-1.5 sm:gap-2">
-            <!-- Brand header with transparent logo -->
-            <div class="flex items-center space-x-1.5 sm:space-x-3 flex-shrink min-w-max">
-                <img src="assets/logo.png" alt="ProteinTracker Logo" class="w-7 h-7 sm:w-10 sm:h-10 object-contain drop-shadow flex-shrink-0">
-                <div class="flex items-center gap-1 sm:gap-1.5">
-                    <h1 class="font-extrabold text-sm sm:text-lg text-white tracking-tight leading-none whitespace-nowrap">ProteinTracker</h1>
-                    <span class="text-[8px] sm:text-[10px] font-bold px-1 sm:px-1.5 py-0.2 rounded bg-brand-500/20 text-brand-300 border border-brand-500/30 whitespace-nowrap">v1.2.0</span>
+    <!-- Header Navbar -->
+    <header class="sticky top-0 z-40 bg-dark-card/90 backdrop-blur-md transition-colors duration-200">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+            <!-- Brand header with responsive larger logo & title and author credit -->
+            <div class="flex items-center space-x-3 flex-shrink min-w-max">
+                <img src="assets/logo.png" alt="ProteinTracker Logo" class="w-12 h-12 sm:w-10 sm:h-10 object-contain drop-shadow flex-shrink-0">
+                <div class="flex flex-col justify-center">
+                    <div class="flex items-center gap-2">
+                        <h1 class="font-black text-xl sm:text-2xl tracking-tight leading-none whitespace-nowrap text-white">ProteinTracker</h1>
+                        <span class="text-xs sm:text-sm font-bold px-2 py-0.5 rounded-lg bg-brand-500/15 text-brand-400 whitespace-nowrap">v1.2.0</span>
+                    </div>
+                    <span class="text-xs sm:text-sm text-dark-textMuted font-semibold tracking-normal mt-1 leading-none">@KaanKayali</span>
                 </div>
             </div>
 
-            <!-- Tab switcher & goal modal button -->
-            <div class="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-                <div class="flex p-0.5 bg-slate-800/90 rounded-lg sm:rounded-xl border border-slate-700/50">
-                    <button id="nav-tracker" onclick="switchTab('tracker')" class="flex items-center space-x-1 sm:space-x-1.5 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-md sm:rounded-lg text-[11px] sm:text-xs font-semibold transition-all duration-200 bg-brand-600 text-white shadow-sm">
-                        <i class="fa-solid fa-plus-circle text-xs"></i>
-                        <span>Tracker</span>
+            <!-- Desktop View Switcher (Hidden on mobile where bottom nav takes over) -->
+            <div class="hidden sm:flex items-center gap-2">
+                <div id="nav-desktop-container" class="flex p-1 bg-dark-bg rounded-2xl transition-colors duration-200">
+                    <button id="nav-desktop-tracker" onclick="switchTab('tracker')" class="flex items-center space-x-2 px-4 py-2 rounded-xl text-sm sm:text-base font-bold transition-all duration-200 bg-brand-600 text-white shadow-none">
+                        <i class="fa-solid fa-plus-circle text-sm sm:text-base"></i>
+                        <span>Tracking</span>
                     </button>
-                    <button id="nav-stats" onclick="switchTab('stats')" class="flex items-center space-x-1 sm:space-x-1.5 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-md sm:rounded-lg text-[11px] sm:text-xs font-semibold text-slate-400 hover:text-white transition-all duration-200">
-                        <i class="fa-solid fa-chart-line text-xs"></i>
-                        <span>Stats</span>
+                    <button id="nav-desktop-profile" onclick="switchTab('profile')" class="flex items-center space-x-2 px-4 py-2 rounded-xl text-sm sm:text-base font-bold text-dark-textMuted hover:text-white transition-all duration-200 shadow-none">
+                        <i class="fa-solid fa-user text-sm sm:text-base"></i>
+                        <span>Profil</span>
                     </button>
                 </div>
-
-                <button onclick="openTargetModal()" title="Settings & Backup" class="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700/50 flex items-center justify-center text-slate-300 hover:text-brand-300 transition-all shadow-sm">
-                    <i class="fa-solid fa-gear text-xs sm:text-sm"></i>
-                </button>
             </div>
         </div>
     </header>
 
-    <!-- Main content container -->
-    <main class="flex-1 max-w-4xl w-full mx-auto p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-5 pb-16 sm:pb-8">
+    <!-- Main content container (pb-24 ensures comfortable spacing above bottom nav on mobile) -->
+    <main class="flex-1 max-w-4xl w-full mx-auto p-3 sm:p-5 space-y-4 sm:space-y-6 pb-24 sm:pb-8">
 
-        <!-- Tracker view -->
-        <div id="view-tracker" class="space-y-4 sm:space-y-5">
+        <!-- ================= TRACKER VIEW ================= -->
+        <div id="view-tracker" class="space-y-4 sm:space-y-6">
 
-            <!-- Today's summary card (expanded padding and flexible layout for complete date display) -->
-            <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-4 sm:p-6 shadow-xl relative overflow-hidden">
-                <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-brand-600/10 rounded-full blur-3xl pointer-events-none"></div>
+            <!-- Today's summary card (Redesigned & enlarged, spacious modern card) -->
+            <div class="bg-dark-card rounded-3xl p-5 sm:p-7 shadow-none relative overflow-hidden transition-colors duration-200 space-y-5 sm:space-y-6">
+                <!-- Top Header: Badge & Full Date -->
+                <div class="flex items-center justify-between gap-2 flex-wrap">
+                    <div class="flex items-center gap-2.5">
+                        <span class="inline-flex items-center px-3.5 py-1 rounded-full text-xs sm:text-sm font-bold bg-brand-500/15 text-brand-400">
+                            <i class="fa-solid fa-circle text-[7px] mr-1.5 animate-pulse text-brand-400"></i>
+                            Heute
+                        </span>
+                        <span id="current-date-display" class="text-sm sm:text-base font-semibold text-dark-textMuted whitespace-normal leading-tight">--</span>
+                    </div>
+                </div>
 
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div class="min-w-0 flex-1">
-                        <div class="flex flex-wrap items-center gap-2">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-500/10 text-brand-400 border border-brand-500/20">
-                                Heute
-                            </span>
-                            <span id="current-date-display" class="text-xs sm:text-sm text-slate-300 font-medium whitespace-normal">--</span>
+                <!-- Hero Section: Big Grams & Goal on Left, Big Progress Circle on Right -->
+                <div class="flex items-center justify-between gap-4">
+                    <!-- Left: Grams & Goal -->
+                    <div class="min-w-0 flex-1 space-y-2">
+                        <div class="flex items-baseline space-x-2">
+                            <span id="today-total" class="text-6xl sm:text-7xl md:text-8xl font-black tracking-tight leading-none text-white">0</span>
+                            <span class="text-2xl sm:text-3xl font-extrabold text-dark-textMuted">g</span>
                         </div>
-                        <div class="mt-2 flex items-baseline space-x-2">
-                            <span id="today-total" class="text-4xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-none">0</span>
-                            <span class="text-base sm:text-xl font-bold text-slate-400">g Protein</span>
+                        <div class="flex items-center gap-2 pt-1">
+                            <i class="fa-solid fa-bullseye text-brand-400 text-sm sm:text-base"></i>
+                            <p id="target-subtitle" class="text-sm sm:text-base font-medium text-dark-textMuted">
+                                Ziel: <span id="target-display-text" class="font-extrabold text-brand-400">160</span>g / Tag
+                            </p>
                         </div>
-                        <p id="target-subtitle" class="text-xs text-slate-400 mt-1">Ziel: <span id="target-display-text" class="font-bold text-brand-300">160</span>g / Tag</p>
                     </div>
 
-                    <div class="flex items-center justify-between sm:justify-end gap-3 sm:gap-5 pt-3 sm:pt-0 border-t border-slate-800/80 sm:border-0 flex-shrink-0">
-                        <!-- Progress ring -->
-                        <div class="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0">
-                            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                                <path class="text-slate-800" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                                <path id="progress-circle" class="text-brand-500 transition-all duration-500 ease-out" stroke-dasharray="0, 100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                            </svg>
-                            <div class="absolute inset-0 flex items-center justify-center flex-col">
-                                <span id="progress-percent" class="text-xs sm:text-sm font-bold text-white">0%</span>
-                            </div>
+                    <!-- Right: Enlarged Progress Circle -->
+                    <div class="relative w-28 h-28 sm:w-36 sm:h-36 flex-shrink-0">
+                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                            <path id="progress-circle-bg" class="text-dark-cardAlt" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path id="progress-circle" class="text-brand-500 transition-all duration-300 ease-out" stroke-dasharray="0, 100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center flex-col">
+                            <span id="progress-percent" class="text-2xl sm:text-3xl md:text-4xl font-black text-white leading-none">0%</span>
+                            <span class="text-[10px] sm:text-xs font-extrabold text-dark-textMuted uppercase tracking-wider mt-1">Ziel</span>
                         </div>
-
-                        <!-- Finish Day button -->
-                        <button onclick="openFinishModal()" title="Finish Day" class="flex items-center space-x-2 px-3.5 sm:px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-95 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-900/30 transition-all whitespace-nowrap">
-                            <i class="fa-solid fa-flag-checkered text-xs"></i>
-                            <span>Finish Day</span>
-                        </button>
                     </div>
+                </div>
+
+                <!-- Bottom: Full-Width Prominent Finish Day Button -->
+                <div class="pt-1">
+                    <button onclick="openFinishModal()" title="Finish Day" class="w-full flex items-center justify-center space-x-2.5 py-3.5 sm:py-4 px-6 bg-emerald-600 hover:bg-emerald-500 active:scale-[0.98] text-white text-base sm:text-lg font-extrabold rounded-2xl transition-all shadow-none">
+                        <i class="fa-solid fa-flag-checkered text-lg"></i>
+                        <span>Finish Day & Speichern</span>
+                    </button>
                 </div>
             </div>
 
-            <!-- Protein input box -->
-            <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-3.5 sm:p-5 shadow-xl space-y-2.5 sm:space-y-4">
+            <!-- Protein input box (Keyboard writable & on-screen keypad compatible) -->
+            <div class="bg-dark-card rounded-3xl p-5 sm:p-6 shadow-none space-y-4 transition-colors duration-200">
                 <div class="flex items-center justify-between">
-                    <h2 class="text-xs sm:text-sm font-bold text-slate-200 flex items-center gap-1.5 sm:gap-2">
-                        <i class="fa-solid fa-utensils text-brand-400"></i>
-                        Protein Hinzufügen
+                    <h2 class="text-base sm:text-lg font-bold flex items-center gap-2 text-white">
+                        <i class="fa-solid fa-utensils text-brand-400 text-base"></i>
+                        <span>Protein Hinzufügen</span>
                     </h2>
-                    <button onclick="toggleKeypad()" id="keypad-toggle-btn" class="text-[11px] sm:text-xs text-brand-400 hover:text-brand-300 flex items-center gap-1.5 md:hidden">
-                        <i class="fa-solid fa-calculator"></i>
+                    <button onclick="toggleKeypad()" id="keypad-toggle-btn" class="text-xs sm:text-sm font-semibold text-brand-400 hover:text-brand-300 flex items-center gap-1.5 md:hidden shadow-none">
+                        <i class="fa-solid fa-calculator text-sm"></i>
                         <span id="keypad-toggle-text">Tastatur ausblenden</span>
                     </button>
                 </div>
 
                 <!-- Input field & submit button -->
-                <div class="flex gap-2">
+                <div class="flex gap-2.5">
                     <div class="relative flex-1">
-                        <input type="number" id="protein-input" placeholder="0" readonly md:readonly="false" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 rounded-xl px-3.5 py-2 sm:py-3 text-xl sm:text-2xl font-bold text-white placeholder-slate-600 outline-none transition-all pr-12">
-                        <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs sm:text-sm font-bold text-slate-500">Gramm</span>
+                        <input type="number" id="protein-input" inputmode="numeric" placeholder="0" class="w-full bg-dark-input rounded-2xl px-4 py-3 sm:py-4 text-2xl sm:text-3xl md:text-4xl font-black placeholder-dark-textMuted outline-none transition-all pr-16 text-white shadow-none">
+                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm sm:text-base font-bold text-dark-textMuted pointer-events-none">Gramm</span>
                     </div>
-                    <button onclick="submitProteinEntry()" class="bg-brand-600 hover:bg-brand-500 active:scale-95 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-lg shadow-brand-600/30 transition-all min-w-[76px] sm:min-w-[100px]">
-                        <i class="fa-solid fa-plus text-xs sm:text-sm"></i>
+                    <button onclick="submitProteinEntry()" class="bg-brand-600 hover:bg-brand-500 active:scale-95 text-white px-5 sm:px-8 py-3 sm:py-4 rounded-2xl font-extrabold text-base sm:text-lg flex items-center justify-center gap-2 transition-all min-w-[88px] sm:min-w-[110px] shadow-none">
+                        <i class="fa-solid fa-plus text-base sm:text-lg"></i>
                         <span>Add</span>
                     </button>
                 </div>
 
-                <!-- Quick add presets -->
-                <div class="flex gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-0.5">
-                    <button onclick="quickAdd(10)" class="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 rounded-lg text-[11px] sm:text-xs font-semibold text-slate-300 transition-all flex-shrink-0">+10g</button>
-                    <button onclick="quickAdd(25)" class="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 rounded-lg text-[11px] sm:text-xs font-semibold text-slate-300 transition-all flex-shrink-0">+25g</button>
-                    <button onclick="quickAdd(30)" class="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 rounded-lg text-[11px] sm:text-xs font-semibold text-slate-300 transition-all flex-shrink-0">+30g (Shake)</button>
-                    <button onclick="quickAdd(50)" class="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 rounded-lg text-[11px] sm:text-xs font-semibold text-slate-300 transition-all flex-shrink-0">+50g</button>
+                <!-- Quick add presets (Including requested +20g button) -->
+                <div class="flex gap-2 overflow-x-auto no-scrollbar py-1">
+                    <button onclick="quickAdd(10)" class="px-3.5 sm:px-4 py-2 sm:py-2.5 bg-dark-cardAlt hover:bg-dark-border rounded-xl text-xs sm:text-sm font-bold text-dark-textMuted transition-all flex-shrink-0 shadow-none">+10g</button>
+                    <button onclick="quickAdd(20)" class="px-3.5 sm:px-4 py-2 sm:py-2.5 bg-dark-cardAlt hover:bg-dark-border rounded-xl text-xs sm:text-sm font-extrabold text-brand-400 transition-all flex-shrink-0 shadow-none">+20g</button>
+                    <button onclick="quickAdd(25)" class="px-3.5 sm:px-4 py-2 sm:py-2.5 bg-dark-cardAlt hover:bg-dark-border rounded-xl text-xs sm:text-sm font-bold text-dark-textMuted transition-all flex-shrink-0 shadow-none">+25g</button>
+                    <button onclick="quickAdd(30)" class="px-3.5 sm:px-4 py-2 sm:py-2.5 bg-dark-cardAlt hover:bg-dark-border rounded-xl text-xs sm:text-sm font-bold text-dark-textMuted transition-all flex-shrink-0 shadow-none">+30g (Shake)</button>
+                    <button onclick="quickAdd(50)" class="px-3.5 sm:px-4 py-2 sm:py-2.5 bg-dark-cardAlt hover:bg-dark-border rounded-xl text-xs sm:text-sm font-bold text-dark-textMuted transition-all flex-shrink-0 shadow-none">+50g</button>
                 </div>
 
-                <!-- On-screen numeric keypad -->
-                <div id="calculator-keypad" class="grid grid-cols-3 gap-1.5 sm:gap-2 pt-1.5 sm:pt-2 border-t border-slate-800/60">
-                    <button onclick="keypadPress('7')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-lg sm:text-xl py-2 sm:py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">7</button>
-                    <button onclick="keypadPress('8')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-lg sm:text-xl py-2 sm:py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">8</button>
-                    <button onclick="keypadPress('9')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-lg sm:text-xl py-2 sm:py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">9</button>
-                    <button onclick="keypadPress('4')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-lg sm:text-xl py-2 sm:py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">4</button>
-                    <button onclick="keypadPress('5')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-lg sm:text-xl py-2 sm:py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">5</button>
-                    <button onclick="keypadPress('6')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-lg sm:text-xl py-2 sm:py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">6</button>
-                    <button onclick="keypadPress('1')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-lg sm:text-xl py-2 sm:py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">1</button>
-                    <button onclick="keypadPress('2')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-lg sm:text-xl py-2 sm:py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">2</button>
-                    <button onclick="keypadPress('3')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-lg sm:text-xl py-2 sm:py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">3</button>
-                    <button onclick="keypadClear()" class="key-btn bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 font-bold text-sm sm:text-base py-2 sm:py-3 rounded-xl border border-rose-500/30 transition-all flex items-center justify-center">C</button>
-                    <button onclick="keypadPress('0')" class="key-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-lg sm:text-xl py-2 sm:py-3 rounded-xl border border-slate-700/50 shadow-sm transition-all">0</button>
-                    <button onclick="keypadBackspace()" class="key-btn bg-slate-800 text-slate-300 hover:bg-slate-700 font-bold text-sm py-2 sm:py-3 rounded-xl border border-slate-700/50 transition-all flex items-center justify-center">
-                        <i class="fa-solid fa-backspace text-base sm:text-lg"></i>
+                <!-- On-screen numeric keypad without glowing effects -->
+                <div id="calculator-keypad" class="grid grid-cols-3 gap-2 pt-2">
+                    <button onclick="keypadPress('7')" class="key-btn bg-dark-cardAlt hover:bg-dark-border text-white font-black text-2xl sm:text-3xl py-3 sm:py-4 rounded-2xl transition-all shadow-none">7</button>
+                    <button onclick="keypadPress('8')" class="key-btn bg-dark-cardAlt hover:bg-dark-border text-white font-black text-2xl sm:text-3xl py-3 sm:py-4 rounded-2xl transition-all shadow-none">8</button>
+                    <button onclick="keypadPress('9')" class="key-btn bg-dark-cardAlt hover:bg-dark-border text-white font-black text-2xl sm:text-3xl py-3 sm:py-4 rounded-2xl transition-all shadow-none">9</button>
+                    <button onclick="keypadPress('4')" class="key-btn bg-dark-cardAlt hover:bg-dark-border text-white font-black text-2xl sm:text-3xl py-3 sm:py-4 rounded-2xl transition-all shadow-none">4</button>
+                    <button onclick="keypadPress('5')" class="key-btn bg-dark-cardAlt hover:bg-dark-border text-white font-black text-2xl sm:text-3xl py-3 sm:py-4 rounded-2xl transition-all shadow-none">5</button>
+                    <button onclick="keypadPress('6')" class="key-btn bg-dark-cardAlt hover:bg-dark-border text-white font-black text-2xl sm:text-3xl py-3 sm:py-4 rounded-2xl transition-all shadow-none">6</button>
+                    <button onclick="keypadPress('1')" class="key-btn bg-dark-cardAlt hover:bg-dark-border text-white font-black text-2xl sm:text-3xl py-3 sm:py-4 rounded-2xl transition-all shadow-none">1</button>
+                    <button onclick="keypadPress('2')" class="key-btn bg-dark-cardAlt hover:bg-dark-border text-white font-black text-2xl sm:text-3xl py-3 sm:py-4 rounded-2xl transition-all shadow-none">2</button>
+                    <button onclick="keypadPress('3')" class="key-btn bg-dark-cardAlt hover:bg-dark-border text-white font-black text-2xl sm:text-3xl py-3 sm:py-4 rounded-2xl transition-all shadow-none">3</button>
+                    <button onclick="keypadClear()" class="key-btn bg-rose-500/15 text-rose-300 hover:bg-rose-500/25 font-black text-base sm:text-lg py-3 sm:py-4 rounded-2xl transition-all flex items-center justify-center shadow-none">C</button>
+                    <button onclick="keypadPress('0')" class="key-btn bg-dark-cardAlt hover:bg-dark-border text-white font-black text-2xl sm:text-3xl py-3 sm:py-4 rounded-2xl transition-all shadow-none">0</button>
+                    <button onclick="keypadBackspace()" class="key-btn bg-dark-cardAlt text-dark-textMuted hover:bg-dark-border font-bold text-base py-3 sm:py-4 rounded-2xl transition-all flex items-center justify-center shadow-none">
+                        <i class="fa-solid fa-backspace text-lg sm:text-xl"></i>
                     </button>
                 </div>
             </div>
 
             <!-- Entries log list -->
-            <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-3.5 sm:p-5 shadow-xl space-y-3">
+            <div class="bg-dark-card rounded-3xl p-5 sm:p-6 shadow-none space-y-4 transition-colors duration-200">
                 <div class="flex items-center justify-between">
-                    <h2 class="text-xs sm:text-sm font-bold text-slate-200 flex items-center gap-1.5 sm:gap-2">
-                        <i class="fa-solid fa-clock-rotate-left text-brand-400"></i>
-                        Einträge der aktuellen Session
+                    <h2 class="text-base sm:text-lg font-bold flex items-center gap-2 text-white">
+                        <i class="fa-solid fa-clock-rotate-left text-brand-400 text-base"></i>
+                        <span>Einträge der aktuellen Session</span>
                     </h2>
-                    <span id="log-count" class="text-[11px] sm:text-xs text-slate-400 bg-slate-800 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full font-semibold">0 Einträge</span>
+                    <span id="log-count" class="text-xs sm:text-sm text-dark-textMuted bg-dark-cardAlt px-3 py-1 rounded-full font-bold">0 Einträge</span>
                 </div>
 
-                <div id="today-logs-container" class="space-y-2 max-h-56 sm:max-h-60 overflow-y-auto pr-1"></div>
+                <div id="today-logs-container" class="space-y-2.5 max-h-60 sm:max-h-72 overflow-y-auto pr-1"></div>
             </div>
         </div>
 
-        <!-- Statistics view -->
-        <div id="view-stats" class="space-y-4 sm:space-y-6 hidden">
-            <!-- Summary metrics -->
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-3">
-                <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-3 sm:p-4">
-                    <p class="text-[11px] sm:text-xs text-slate-400 font-medium">Ø Pro beendetem Tag</p>
-                    <p id="avg-7-days" class="text-xl sm:text-2xl font-black text-white mt-1">0 g</p>
-                </div>
-                <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-3 sm:p-4">
-                    <p class="text-[11px] sm:text-xs text-slate-400 font-medium">Bester beendeter Tag</p>
-                    <p id="max-day-record" class="text-xl sm:text-2xl font-black text-emerald-400 mt-1">0 g</p>
-                </div>
-                <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-3 sm:p-4 col-span-2 md:col-span-1">
-                    <p class="text-[11px] sm:text-xs text-slate-400 font-medium">Gesamttotal</p>
-                    <p id="total-all-time" class="text-xl sm:text-2xl font-black text-brand-400 mt-1">0 g</p>
+        <!-- ================= PROFILE & STATS & SETTINGS VIEW ================= -->
+        <div id="view-profile" class="space-y-4 sm:space-y-6 hidden">
+
+            <!-- Profile Overview Header Card -->
+            <div class="bg-dark-card rounded-3xl p-5 sm:p-6 shadow-none transition-colors duration-200">
+                <div class="flex items-center space-x-4">
+                    <div class="w-14 h-14 rounded-2xl bg-brand-500/15 text-brand-400 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-user text-xl sm:text-2xl"></i>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <h2 class="font-black text-lg sm:text-xl text-white leading-tight truncate">Dein Profil & Statistik</h2>
+                        <p class="text-xs sm:text-sm text-dark-textMuted mt-0.5">Fortschrittsübersicht & Personalisierung</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- Chart card: showing all finished days with date & time -->
-            <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-4 sm:p-5 shadow-xl space-y-3 sm:space-y-4">
-                <div class="flex flex-wrap items-center justify-between gap-2">
+            <!-- Summary metrics -->
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+                <div class="bg-dark-card rounded-3xl p-4 sm:p-5 shadow-none transition-colors duration-200">
+                    <p class="text-xs sm:text-sm text-dark-textMuted font-bold">Ø Pro beendetem Tag</p>
+                    <p id="avg-7-days" class="text-2xl sm:text-3xl font-black text-white mt-1.5">0 g</p>
+                </div>
+                <div class="bg-dark-card rounded-3xl p-4 sm:p-5 shadow-none transition-colors duration-200">
+                    <p class="text-xs sm:text-sm text-dark-textMuted font-bold">Bester beendeter Tag</p>
+                    <p id="max-day-record" class="text-2xl sm:text-3xl font-black text-emerald-400 mt-1.5">0 g</p>
+                </div>
+                <div class="bg-dark-card rounded-3xl p-4 sm:p-5 col-span-2 md:col-span-1 shadow-none transition-colors duration-200">
+                    <p class="text-xs sm:text-sm text-dark-textMuted font-bold">Gesamttotal</p>
+                    <p id="total-all-time" class="text-2xl sm:text-3xl font-black text-brand-400 mt-1.5">0 g</p>
+                </div>
+            </div>
+
+            <!-- Chart card: showing all finished days with date & time (Instant render without animation) -->
+            <div class="bg-dark-card rounded-3xl p-5 sm:p-6 shadow-none space-y-4 transition-colors duration-200">
+                <div class="flex flex-wrap items-center justify-between gap-2.5">
                     <div>
-                        <h2 class="text-xs sm:text-sm font-bold text-slate-200 flex items-center gap-1.5 sm:gap-2">
-                            <i class="fa-solid fa-chart-column text-brand-400"></i>
-                            Verlauf beendeter Tage
+                        <h2 class="text-base sm:text-lg font-bold flex items-center gap-2 text-white">
+                            <i class="fa-solid fa-chart-column text-brand-400 text-base"></i>
+                            <span>Verlauf beendeter Tage</span>
                         </h2>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Erreichte Proteine geordnet nach Abschluss-Datum und Uhrzeit</p>
+                        <p class="text-xs sm:text-sm text-dark-textMuted mt-0.5">Erreichte Proteine geordnet nach Abschluss-Datum und Uhrzeit</p>
                     </div>
-                    <div class="flex items-center space-x-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
-                        <button onclick="setChartType('bar')" id="chart-btn-bar" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-brand-600 text-white">Balken</button>
-                        <button onclick="setChartType('line')" id="chart-btn-line" class="px-2.5 py-1 rounded-lg text-xs font-bold text-slate-400 hover:text-white">Linie</button>
+                    <div id="chart-type-container" class="flex items-center space-x-1 bg-dark-bg p-1 rounded-2xl transition-colors duration-200">
+                        <button onclick="setChartType('bar')" id="chart-btn-bar" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-brand-600 text-white shadow-none">Balken</button>
+                        <button onclick="setChartType('line')" id="chart-btn-line" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-dark-textMuted hover:text-white shadow-none">Linie</button>
                     </div>
                 </div>
 
@@ -250,87 +295,113 @@
                     <canvas id="proteinChart"></canvas>
                 </div>
             </div>
+
+            <!-- Integrated Settings in Profile -->
+            <div class="bg-dark-card rounded-3xl p-5 sm:p-7 shadow-none space-y-6 transition-colors duration-200">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2.5">
+                        <div class="w-10 h-10 rounded-xl bg-brand-500/15 text-brand-400 flex items-center justify-center text-base font-bold">
+                            <i class="fa-solid fa-sliders"></i>
+                        </div>
+                        <h3 class="text-base sm:text-lg font-black text-white">Einstellungen</h3>
+                    </div>
+                </div>
+
+                <!-- Appearance Theme Toggle (Light / Dark mode) -->
+                <div class="space-y-2.5">
+                    <h4 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-dark-textMuted">Design-Modus</h4>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <button onclick="setAppTheme('dark')" id="theme-btn-dark" class="flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-brand-600/20 text-white text-xs sm:text-sm font-bold transition-all shadow-none">
+                            <i class="fa-solid fa-moon text-base"></i>
+                            <span>Dark Mode</span>
+                        </button>
+                        <button onclick="setAppTheme('light')" id="theme-btn-light" class="flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-dark-cardAlt text-dark-textMuted hover:text-white text-xs sm:text-sm font-bold transition-all shadow-none">
+                            <i class="fa-solid fa-sun text-base"></i>
+                            <span>Light Mode</span>
+                        </button>
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- Target Goal Form -->
+                <div class="space-y-2.5">
+                    <h4 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-dark-textMuted">Tägliches Proteinziel</h4>
+                    <p class="text-xs sm:text-sm text-dark-textMuted">
+                        Passe dein tägliches Proteinziel an. Das Ziel bleibt dauerhaft aktiv.
+                    </p>
+
+                    <form onsubmit="handleTargetFormSubmit(event)" class="flex flex-col sm:flex-row gap-2.5 pt-1">
+                        <div class="relative flex-1">
+                            <input type="number" id="target-modal-input" min="1" max="1000" placeholder="z. B. 160" required class="w-full bg-dark-input rounded-2xl px-4 py-3 text-base sm:text-lg font-bold placeholder-dark-textMuted outline-none transition-all pr-16 text-white shadow-none">
+                            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs sm:text-sm font-bold text-dark-textMuted pointer-events-none">g / Tag</span>
+                        </div>
+                        <button type="submit" class="px-6 py-3 rounded-2xl bg-brand-600 hover:bg-brand-500 active:scale-95 text-white text-xs sm:text-sm font-bold transition-all shadow-none whitespace-nowrap">Ziel Speichern</button>
+                    </form>
+                </div>
+
+                <hr>
+
+                <!-- Backup & Migration -->
+                <div class="space-y-3">
+                    <h4 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-dark-textMuted">Backup & Übertragung</h4>
+                    <p class="text-xs sm:text-sm text-dark-textMuted">
+                        Exportiere deine Einträge als JSON-Datei zur Sicherung oder um sie zwischen Handy und Laptop zu synchronisieren.
+                    </p>
+
+                    <div class="grid grid-cols-2 gap-2.5 pt-1">
+                        <button onclick="exportDataBackup()" class="theme-dark-text flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-dark-cardAlt hover:bg-dark-border text-white text-xs sm:text-sm font-bold transition-all shadow-none">
+                            <i class="fa-solid fa-download text-brand-400 text-sm sm:text-base"></i>
+                            <span>Exportieren</span>
+                        </button>
+                        <button onclick="triggerImportFileInput()" class="theme-dark-text flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-dark-cardAlt hover:bg-dark-border text-white text-xs sm:text-sm font-bold transition-all shadow-none">
+                            <i class="fa-solid fa-upload text-emerald-400 text-sm sm:text-base"></i>
+                            <span>Importieren</span>
+                        </button>
+                    </div>
+                    <input type="file" id="import-file-input" accept=".json,application/json" onchange="handleImportFile(event)" class="hidden">
+                </div>
+
+                <hr>
+
+                <!-- Danger Zone: Reset Data -->
+                <div class="pt-1">
+                    <button onclick="confirmClearHistory()" class="w-full px-4 py-3 rounded-2xl text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 text-xs sm:text-sm font-bold transition-all text-center shadow-none">
+                        Alle Verlaufsdaten löschen
+                    </button>
+                </div>
+            </div>
         </div>
 
     </main>
 
+    <!-- Mobile Bottom Navigation Bar (iOS / Mobile First Navigation) -->
+    <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-dark-card/95 backdrop-blur-lg px-6 py-2.5 transition-colors duration-200" style="padding-bottom: max(0.6rem, env(safe-area-inset-bottom));">
+        <div class="flex items-center justify-around max-w-sm mx-auto">
+            <button id="nav-mobile-tracker" onclick="switchTab('tracker')" class="flex flex-col items-center justify-center py-1 px-4 text-brand-400 transition-colors shadow-none">
+                <i class="fa-solid fa-plus-circle text-xl sm:text-2xl mb-1"></i>
+                <span class="text-xs sm:text-sm font-bold">Tracking</span>
+            </button>
+            <button id="nav-mobile-profile" onclick="switchTab('profile')" class="flex flex-col items-center justify-center py-1 px-4 text-dark-textMuted hover:text-white transition-colors shadow-none">
+                <i class="fa-solid fa-user text-xl sm:text-2xl mb-1"></i>
+                <span class="text-xs sm:text-sm font-semibold">Profil</span>
+            </button>
+        </div>
+    </nav>
+
     <!-- Modal: Finish day confirmation -->
-    <div id="finish-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-2xl animate-in fade-in zoom-in duration-200">
-            <div class="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto text-xl">
+    <div id="finish-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-dark-card rounded-3xl p-6 sm:p-8 max-w-sm w-full space-y-5 shadow-none animate-in fade-in zoom-in duration-200">
+            <div class="w-14 h-14 rounded-full bg-emerald-500/15 text-emerald-400 flex items-center justify-center mx-auto text-2xl">
                 <i class="fa-solid fa-flag-checkered"></i>
             </div>
-            <div class="text-center space-y-1">
-                <h3 class="text-lg font-bold text-white">Tag jetzt beenden?</h3>
-                <p class="text-xs text-slate-400">Dein Gesamttotal von <span id="modal-protein-amount" class="text-white font-bold">0g</span> wird mit aktuellem Datum und Uhrzeit im Diagramm gespeichert. Danach startet der Zähler neu.</p>
+            <div class="text-center space-y-2">
+                <h3 class="text-xl sm:text-2xl font-black text-white">Tag jetzt beenden?</h3>
+                <p class="text-xs sm:text-sm text-dark-textMuted">Dein Gesamttotal von <span id="modal-protein-amount" class="text-white font-bold">0g</span> wird mit aktuellem Datum und Uhrzeit im Diagramm gespeichert. Danach startet der Zähler neu.</p>
             </div>
-            <div class="flex gap-2 pt-2">
-                <button onclick="closeFinishModal()" class="flex-1 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition-all">Abbrechen</button>
-                <button onclick="confirmFinishDay()" class="flex-1 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-lg shadow-emerald-600/30 transition-all">Ja, Beenden</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal: Settings & Backup -->
-    <div id="target-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-sm w-full space-y-5 shadow-2xl animate-in fade-in zoom-in duration-200 max-h-[90vh] overflow-y-auto">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                    <div class="w-8 h-8 rounded-lg bg-brand-500/10 border border-brand-500/20 text-brand-400 flex items-center justify-center text-sm font-bold">
-                        <i class="fa-solid fa-gear"></i>
-                    </div>
-                    <h3 class="text-base font-bold text-white">Einstellungen & Daten</h3>
-                </div>
-                <button onclick="closeTargetModal()" class="text-slate-400 hover:text-white transition-colors">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <!-- Target Goal Form -->
-            <div class="space-y-2">
-                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Tägliches Proteinziel</h4>
-                <p class="text-xs text-slate-400">
-                    Lege dein Proteinziel fest. Dieses Ziel bleibt dauerhaft aktiv.
-                </p>
-
-                <form onsubmit="handleTargetFormSubmit(event)" class="space-y-2.5 pt-1">
-                    <div class="relative">
-                        <input type="number" id="target-modal-input" min="1" max="1000" placeholder="z. B. 160" required class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 rounded-xl px-4 py-2.5 text-base font-bold text-white placeholder-slate-600 outline-none transition-all pr-14">
-                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-500">g / Tag</span>
-                    </div>
-                    <button type="submit" class="w-full px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold shadow-lg shadow-brand-600/30 transition-all">Ziel Speichern</button>
-                </form>
-            </div>
-
-            <hr class="border-slate-800">
-
-            <!-- Data Backup & Migration (Export / Import) -->
-            <div class="space-y-2.5">
-                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Backup & Übertragung</h4>
-                <p class="text-xs text-slate-400">
-                    Exportiere deine Einträge als JSON-Datei zur Sicherung oder um sie zwischen Handy und Laptop zu übertragen.
-                </p>
-
-                <div class="grid grid-cols-2 gap-2 pt-1">
-                    <button onclick="exportDataBackup()" class="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700/60 text-slate-200 text-xs font-bold transition-all">
-                        <i class="fa-solid fa-download text-brand-400"></i>
-                        <span>Backup Export</span>
-                    </button>
-                    <button onclick="triggerImportFileInput()" class="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700/60 text-slate-200 text-xs font-bold transition-all">
-                        <i class="fa-solid fa-upload text-emerald-400"></i>
-                        <span>Backup Import</span>
-                    </button>
-                </div>
-                <input type="file" id="import-file-input" accept=".json,application/json" onchange="handleImportFile(event)" class="hidden">
-            </div>
-
-            <hr class="border-slate-800">
-
-            <!-- Reset / Clear Data -->
-            <div class="pt-1">
-                <button onclick="confirmClearHistory()" class="w-full px-3 py-2 rounded-xl text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 text-xs font-semibold transition-all text-center">
-                    Alle Verlaufsdaten löschen
-                </button>
+            <div class="flex gap-2.5 pt-2">
+                <button onclick="closeFinishModal()" class="flex-1 px-4 py-3 sm:py-3.5 rounded-2xl bg-dark-cardAlt hover:bg-dark-border text-dark-textMuted hover:text-white text-xs sm:text-sm font-bold transition-all shadow-none">Abbrechen</button>
+                <button onclick="confirmFinishDay()" class="flex-1 px-4 py-3 sm:py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-extrabold transition-all shadow-none">Ja, Beenden</button>
             </div>
         </div>
     </div>

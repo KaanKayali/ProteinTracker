@@ -1,11 +1,31 @@
 /* Global theme variables */
 :root {
     --brand-main: #9a80b2;
+    --brand-dark: #866b9f;
 }
 
-/* Keypad tactile feedback */
+/* Base resets, iOS optimizations & Global font size scaling */
+html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    font-size: 17px; /* Globally enlarges all typography across mobile & desktop */
+}
+
+@media (min-width: 640px) {
+    html {
+        font-size: 18px; /* Extra spacious and comfortable scaling on laptop/desktop */
+    }
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Keypad tactile feedback without glow */
 .key-btn:active {
-    transform: scale(0.95);
+    transform: scale(0.96);
+    filter: brightness(0.92);
 }
 
 /* Hide scrollbars across browsers */
@@ -16,4 +36,138 @@
 .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+}
+
+/* STRICT RULE: Absolutely NO outlines or box-shadows on ANY container, button, or input */
+*,
+*::before,
+*::after,
+*:focus,
+*:active,
+*:focus-visible,
+*:focus-within,
+button,
+button:focus,
+button:active,
+button:focus-visible,
+input,
+input:focus,
+input:active,
+input:focus-visible,
+div,
+div:focus,
+div:active,
+div:focus-visible,
+a,
+a:focus,
+a:focus-visible {
+    outline: none !important;
+    outline-width: 0 !important;
+    outline-style: none !important;
+    box-shadow: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-focus-ring-color: transparent !important;
+}
+
+/* ZERO OUTLINE / BORDER LINES ON CONTAINERS & DIVS:
+   Removes any darker or lighter outline/stroke framing around divs, cards, inputs, and buttons.
+   Containers look seamlessly flat and modern with smooth rounded surfaces. */
+div,
+header,
+nav,
+main,
+section,
+card,
+button,
+input,
+.border,
+.border-t,
+.border-b,
+.border-l,
+.border-r,
+.border-dark-border,
+.border-light-border {
+    border-color: transparent !important;
+}
+
+hr {
+    border-color: rgba(148, 155, 164, 0.12) !important;
+}
+
+/* Subtle transitions for theme switching */
+body, header, nav, div, button, input {
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* =========================================================
+   LIGHT MODE PALETTE OVERRIDES (Medium-light gray & Crisp Dark Text)
+   Prevents harsh glare, ensures comfortable light gray tone,
+   and guarantees laptop switchers & text are fully adapted.
+   ========================================================= */
+html:not(.dark) {
+    color-scheme: light;
+}
+
+html:not(.dark) body {
+    background-color: #dbe0e8 !important;
+    color: #0f172a !important;
+}
+
+html:not(.dark) .bg-dark-bg {
+    background-color: #e2e6ed !important;
+}
+
+html:not(.dark) .bg-dark-card {
+    background-color: #edf0f5 !important;
+}
+
+html:not(.dark) .bg-dark-cardAlt {
+    background-color: #e2e6ed !important;
+}
+
+html:not(.dark) .bg-dark-input {
+    background-color: #f7f9fb !important;
+    color: #0f172a !important;
+}
+
+html:not(.dark) .text-dark-textMuted {
+    color: #475569 !important;
+}
+
+html:not(.dark) .text-brand-400 {
+    color: #715689 !important;
+}
+
+/* Headings and primary values in light mode become dark crisp text */
+html:not(.dark) h1.text-white,
+html:not(.dark) h2.text-white,
+html:not(.dark) h3.text-white,
+html:not(.dark) h4.text-white,
+html:not(.dark) #today-total,
+html:not(.dark) #progress-percent,
+html:not(.dark) #avg-7-days,
+html:not(.dark) #modal-protein-amount,
+html:not(.dark) .key-btn.text-white,
+html:not(.dark) .theme-dark-text {
+    color: #0f172a !important;
+}
+
+html:not(.dark) #max-day-record {
+    color: #059669 !important;
+}
+
+html:not(.dark) #total-all-time {
+    color: #715689 !important;
+}
+
+html:not(.dark) #target-display-text {
+    color: #715689 !important;
+}
+
+/* Ensure buttons with solid brand or emerald backgrounds keep crisp white text */
+.bg-brand-600,
+.bg-brand-500,
+.bg-emerald-600,
+.bg-emerald-500 {
+    color: #ffffff !important;
 }
