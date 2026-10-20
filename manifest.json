@@ -1,0 +1,16 @@
+{
+  "name": "ProteinTracker",
+  "short_name": "ProteinTracker",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#9a80b2",
+  "icons": [
+    {
+      "src": "assets/apple-touch-icon.png",
+      "sizes": "192x192 512x512 1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

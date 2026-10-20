@@ -2,7 +2,6 @@
 const LOCAL_LOGS_KEY = 'protein_tracker_logs_v1';
 const LOCAL_FINISHED_KEY = 'protein_tracker_finished_v1';
 const LOCAL_TARGET_KEY = 'protein_tracker_target_v1';
-const LOCAL_CURRENT_DATE_KEY = 'protein_tracker_active_date_v1';
 
 // App state
 let activeLogs = [];
@@ -10,7 +9,6 @@ let finishedDays = [];
 let dailyTarget = 160;
 let chartInstance = null;
 let activeChartType = 'bar';
-let activeWorkingDate = null;
 
 // Theme accent colors
 const BRAND_MAIN = '#9a80b2';
@@ -20,7 +18,6 @@ const BRAND_LIGHT = '#b096c4';
 // Boot up app once DOM is ready
 window.addEventListener('DOMContentLoaded', () => {
     loadStoredData();
-    checkDayTransition();
     updateCurrentDateHeader();
     renderDashboard();
     initChart();
@@ -36,89 +33,13 @@ function getTodayDateString() {
     return `${yyyy}-${mm}-${dd}`;
 }
 
-// Display formatted date string in header and banner
+// Display formatted date string in header
 function updateCurrentDateHeader() {
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    const todayStr = new Date().toLocaleDateString('en-US', options);
+    const todayStr = new Date().toLocaleDateString('de-DE', options);
     const dateDisplay = document.getElementById('current-date-display');
     if (dateDisplay) {
         dateDisplay.innerText = todayStr;
-    }
-}
-
-// Handle transition if opening app on a new calendar day
-function checkDayTransition() {
-    const todayStr = getTodayDateString();
-    const banner = document.getElementById('day-rollover-banner');
-    const bannerText = document.getElementById('day-rollover-text');
-
-    if (!activeWorkingDate) {
-        activeWorkingDate = todayStr;
-        saveData();
-        return;
-    }
-
-    if (activeWorkingDate !== todayStr) {
-        // Find unfinalized logs from previous day(s)
-        const pastLogs = activeLogs.filter(log => log.dateString === activeWorkingDate);
-        const pastSum = pastLogs.reduce((sum, log) => sum + log.amount, 0);
-
-        if (pastLogs.length > 0 && pastSum > 0) {
-            if (banner && bannerText) {
-                bannerText.innerText = `New day started. You have ${pastSum}g unfinalized from ${activeWorkingDate}. Archive it to yesterday's history or continue tracking.`;
-                banner.classList.remove('hidden');
-            }
-        } else {
-            activeWorkingDate = todayStr;
-            saveData();
-        }
-    }
-}
-
-// User action from banner to archive prior day
-function archivePreviousDayFromBanner() {
-    if (!activeWorkingDate) return;
-    const pastLogs = activeLogs.filter(log => log.dateString === activeWorkingDate);
-
-    if (pastLogs.length > 0) {
-        const finishedEntry = {
-            dateString: activeWorkingDate,
-            logs: pastLogs.map(l => ({ id: l.id, timestamp: l.timestamp, amount: l.amount }))
-        };
-
-        finishedDays = finishedDays.filter(day => day.dateString !== activeWorkingDate);
-        finishedDays.unshift(finishedEntry);
-        activeLogs = activeLogs.filter(log => log.dateString !== activeWorkingDate);
-    }
-
-    activeWorkingDate = getTodayDateString();
-    saveData();
-    dismissDayRolloverBanner();
-    renderDashboard();
-    updateChart();
-}
-
-// User chooses to merge yesterday's entries into today
-function carryOverToTodayFromBanner() {
-    const todayStr = getTodayDateString();
-    activeLogs = activeLogs.map(log => {
-        if (log.dateString === activeWorkingDate) {
-            return { ...log, dateString: todayStr };
-        }
-        return log;
-    });
-
-    activeWorkingDate = todayStr;
-    saveData();
-    dismissDayRolloverBanner();
-    renderDashboard();
-    updateChart();
-}
-
-function dismissDayRolloverBanner() {
-    const banner = document.getElementById('day-rollover-banner');
-    if (banner) {
-        banner.classList.add('hidden');
     }
 }
 
@@ -136,12 +57,12 @@ function loadStoredData() {
             dailyTarget = parseInt(targetRaw, 10) || 160;
         }
 
-        activeWorkingDate = localStorage.getItem(LOCAL_CURRENT_DATE_KEY) || getTodayDateString();
+        // Clean up legacy key if present
+        localStorage.removeItem('protein_tracker_active_date_v1');
     } catch (err) {
         console.error('Failed to load local storage data:', err);
         activeLogs = [];
         finishedDays = [];
-        activeWorkingDate = getTodayDateString();
     }
 }
 
@@ -151,9 +72,6 @@ function saveData() {
         localStorage.setItem(LOCAL_LOGS_KEY, JSON.stringify(activeLogs));
         localStorage.setItem(LOCAL_FINISHED_KEY, JSON.stringify(finishedDays));
         localStorage.setItem(LOCAL_TARGET_KEY, dailyTarget.toString());
-        if (activeWorkingDate) {
-            localStorage.setItem(LOCAL_CURRENT_DATE_KEY, activeWorkingDate);
-        }
     } catch (err) {
         console.error('Failed to save to local storage:', err);
     }
@@ -224,8 +142,6 @@ function submitProteinEntry() {
     }
 
     const todayStr = getTodayDateString();
-    activeWorkingDate = todayStr;
-
     const now = new Date();
     const newEntry = {
         id: 'log_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
@@ -260,19 +176,14 @@ function getFinishedDayAmount(dayItem) {
     return Number(dayItem.totalAmount) || 0;
 }
 
-// Sum of grams currently active (today + unfinalized)
+// Sum of grams currently active
 function getTodayTotal() {
-    const todayStr = getTodayDateString();
-    return activeLogs
-        .filter(log => log.dateString === todayStr || log.dateString === activeWorkingDate)
-        .reduce((sum, log) => sum + log.amount, 0);
+    return activeLogs.reduce((sum, log) => sum + log.amount, 0);
 }
 
 // Re-render UI elements
 function renderDashboard() {
     const todayTotal = getTodayTotal();
-    const todayStr = getTodayDateString();
-    const displayLogs = activeLogs.filter(log => log.dateString === todayStr || log.dateString === activeWorkingDate);
 
     // Summary totals and target
     const todayTotalEl = document.getElementById('today-total');
@@ -292,10 +203,10 @@ function renderDashboard() {
     // Log list container
     const container = document.getElementById('today-logs-container');
     const logCountEl = document.getElementById('log-count');
-    if (logCountEl) logCountEl.innerText = `${displayLogs.length} ${displayLogs.length === 1 ? 'Entry' : 'Entries'}`;
+    if (logCountEl) logCountEl.innerText = `${activeLogs.length} ${activeLogs.length === 1 ? 'Entry' : 'Entries'}`;
 
     if (container) {
-        if (displayLogs.length === 0) {
+        if (activeLogs.length === 0) {
             container.innerHTML = `
                 <div class="text-center py-6 text-slate-500 border border-dashed border-slate-800 rounded-xl">
                     <i class="fa-solid fa-cookie-bite text-2xl mb-1 opacity-40"></i>
@@ -303,8 +214,8 @@ function renderDashboard() {
                 </div>
             `;
         } else {
-            container.innerHTML = displayLogs.map(log => {
-                const timeStr = new Date(log.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+            container.innerHTML = activeLogs.map(log => {
+                const timeStr = new Date(log.timestamp).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
                 return `
                     <div class="flex items-center justify-between p-3 bg-slate-950/60 border border-slate-800/80 rounded-xl hover:border-slate-700 transition-all">
                         <div class="flex items-center space-x-3">
@@ -313,7 +224,7 @@ function renderDashboard() {
                             </div>
                             <div>
                                 <p class="text-sm font-bold text-white">+${log.amount}g Protein</p>
-                                <p class="text-[10px] text-slate-400"><i class="fa-regular fa-clock mr-1"></i>${timeStr}</p>
+                                <p class="text-[10px] text-slate-400"><i class="fa-regular fa-clock mr-1"></i>${timeStr} Uhr</p>
                             </div>
                         </div>
                         <button onclick="deleteLogEntry('${log.id}')" class="text-slate-500 hover:text-rose-400 p-2 rounded-lg transition-colors" title="Delete entry">
@@ -342,30 +253,29 @@ function closeFinishModal() {
     if (finishModal) finishModal.classList.add('hidden');
 }
 
+// Confirm day completion: records completion timestamp (e.g. 17. Oktober 00:02)
 function confirmFinishDay() {
-    const targetDate = activeWorkingDate || getTodayDateString();
-    const dayLogs = activeLogs.filter(log => log.dateString === targetDate);
+    const finishDate = new Date();
+    const yyyy = finishDate.getFullYear();
+    const mm = String(finishDate.getMonth() + 1).padStart(2, '0');
+    const dd = String(finishDate.getDate()).padStart(2, '0');
+    const dateStr = `${yyyy}-${mm}-${dd}`;
 
-    // Save only the individual values and timestamp
     const finishedEntry = {
-        dateString: targetDate,
-        finishedAt: new Date().toISOString(),
-        logs: dayLogs.map(l => ({ id: l.id, timestamp: l.timestamp, amount: l.amount }))
+        id: 'finish_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        dateString: dateStr,
+        finishedAt: finishDate.toISOString(),
+        logs: activeLogs.map(l => ({ id: l.id, timestamp: l.timestamp, amount: l.amount }))
     };
 
-    // Replace if this date was previously finalized, else prepend
-    finishedDays = finishedDays.filter(day => day.dateString !== targetDate);
+    // Prepend new completion entry (allows multiple completions per day)
     finishedDays.unshift(finishedEntry);
 
-    // Clear active logs for finalized date
-    activeLogs = activeLogs.filter(log => log.dateString !== targetDate);
-
-    // Advance working date to today
-    activeWorkingDate = getTodayDateString();
+    // Clear active logs for next session
+    activeLogs = [];
 
     saveData();
     closeFinishModal();
-    dismissDayRolloverBanner();
     renderDashboard();
     updateChart();
 }
@@ -376,7 +286,7 @@ function renderStatsSummary() {
     const totalAllTime = finishedTotals.reduce((a, b) => a + b, 0) + getTodayTotal();
     const maxRecord = finishedTotals.length > 0 ? Math.max(...finishedTotals) : 0;
     
-    // Average across finished days
+    // Average across finished sessions
     const avgFinished = finishedTotals.length > 0 ? Math.round(finishedTotals.reduce((a, b) => a + b, 0) / finishedTotals.length) : 0;
 
     const avgEl = document.getElementById('avg-7-days');
@@ -388,24 +298,60 @@ function renderStatsSummary() {
     if (totalAllTimeEl) totalAllTimeEl.innerText = `${totalAllTime} g`;
 }
 
+// Helper: Parse finish date & time with backwards compatibility
+function parseFinishedDateTime(item) {
+    if (item.finishedAt) {
+        const d = new Date(item.finishedAt);
+        if (!isNaN(d.getTime())) {
+            const dateLine = d.toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' });
+            const timeLine = d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+            return {
+                sortTime: d.getTime(),
+                dateLine: dateLine,
+                timeLine: timeLine,
+                fullLabel: `${dateLine} ${timeLine}`
+            };
+        }
+    }
+
+    // Legacy fallback without finishedAt timestamp: default to 00:00
+    if (item.dateString) {
+        const d = new Date(item.dateString + 'T00:00:00');
+        const dateLine = !isNaN(d.getTime())
+            ? d.toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' })
+            : item.dateString;
+        return {
+            sortTime: !isNaN(d.getTime()) ? d.getTime() : 0,
+            dateLine: dateLine,
+            timeLine: '00:00',
+            fullLabel: `${dateLine} 00:00`
+        };
+    }
+
+    return {
+        sortTime: 0,
+        dateLine: '--',
+        timeLine: '00:00',
+        fullLabel: '-- 00:00'
+    };
+}
+
 // Prepare dataset for Chart.js across all finished days
 function getAggregatedChartData() {
-    // Map dateString -> total calculated on the fly
-    const map = {};
-
-    finishedDays.forEach(d => {
-        map[d.dateString] = getFinishedDayAmount(d);
+    // Clone and sort entries chronologically (oldest -> newest)
+    const sorted = [...finishedDays].sort((a, b) => {
+        const timeA = parseFinishedDateTime(a).sortTime;
+        const timeB = parseFinishedDateTime(b).sortTime;
+        return timeA - timeB;
     });
 
-    // Sort all dates chronologically
-    const sortedDates = Object.keys(map).sort();
-
-    const labels = sortedDates.map(d => {
-        const dateObj = new Date(d + 'T00:00:00');
-        return dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const labels = sorted.map(item => {
+        const parsed = parseFinishedDateTime(item);
+        // Multi-line centered array label: [ "16. Oktober 2026", "23:50" ]
+        return [parsed.dateLine, parsed.timeLine];
     });
 
-    const data = sortedDates.map(d => map[d]);
+    const data = sorted.map(item => getFinishedDayAmount(item));
 
     return { labels, data };
 }
@@ -421,7 +367,7 @@ function initChart() {
         data: {
             labels: labels,
             datasets: [{
-                label: 'Finished Protein (g)',
+                label: 'Protein (g)',
                 data: data,
                 backgroundColor: 'rgba(154, 128, 178, 0.4)',
                 borderColor: BRAND_MAIN,
@@ -447,14 +393,28 @@ function initChart() {
                     padding: 10,
                     displayColors: false,
                     callbacks: {
-                        label: (context) => `${context.parsed.y} g Protein finalized`
+                        title: (context) => {
+                            if (!context || !context[0]) return '';
+                            const rawLabel = context[0].label;
+                            if (Array.isArray(rawLabel)) {
+                                return rawLabel.join(' • ');
+                            }
+                            return rawLabel;
+                        },
+                        label: (context) => `${context.parsed.y} g Protein`
                     }
                 }
             },
             scales: {
                 x: {
                     grid: { display: false, drawBorder: false },
-                    ticks: { color: '#94a3b8', font: { size: 10 } }
+                    ticks: {
+                        color: '#94a3b8',
+                        font: { size: 10 },
+                        align: 'center',
+                        maxRotation: 0,
+                        minRotation: 0
+                    }
                 },
                 y: {
                     grid: { color: 'rgba(51, 65, 85, 0.4)', drawBorder: false },
@@ -554,10 +514,9 @@ function handleTargetFormSubmit(event) {
 // Export data backup to a JSON file
 function exportDataBackup() {
     const backupData = {
-        version: '1.1.0',
+        version: '1.2.0',
         exportedAt: new Date().toISOString(),
         dailyTarget: dailyTarget,
-        activeWorkingDate: activeWorkingDate,
         activeLogs: activeLogs,
         finishedDays: finishedDays
     };
@@ -600,14 +559,32 @@ function handleImportFile(event) {
                 }
 
                 if (Array.isArray(data.finishedDays)) {
-                    const existingMap = new Map();
-                    finishedDays.forEach(day => existingMap.set(day.dateString, day));
-                    data.finishedDays.forEach(day => {
-                        if (day && day.dateString) {
-                            existingMap.set(day.dateString, day);
+                    // Normalize and merge finished days
+                    data.finishedDays.forEach(incoming => {
+                        if (!incoming) return;
+                        const incomingFinishedAt = incoming.finishedAt || (incoming.dateString ? incoming.dateString + 'T00:00:00' : null);
+                        const alreadyExists = finishedDays.some(f => {
+                            if (incoming.id && f.id && incoming.id === f.id) return true;
+                            if (incomingFinishedAt && f.finishedAt && incomingFinishedAt === f.finishedAt) return true;
+                            return false;
+                        });
+
+                        if (!alreadyExists) {
+                            finishedDays.push({
+                                id: incoming.id || ('finish_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4)),
+                                dateString: incoming.dateString || getTodayDateString(),
+                                finishedAt: incomingFinishedAt || new Date().toISOString(),
+                                logs: Array.isArray(incoming.logs) ? incoming.logs : []
+                            });
                         }
                     });
-                    finishedDays = Array.from(existingMap.values()).sort((a, b) => b.dateString.localeCompare(a.dateString));
+
+                    // Sort newest to oldest in array
+                    finishedDays.sort((a, b) => {
+                        const timeA = parseFinishedDateTime(a).sortTime;
+                        const timeB = parseFinishedDateTime(b).sortTime;
+                        return timeB - timeA;
+                    });
                 }
 
                 if (Array.isArray(data.activeLogs)) {

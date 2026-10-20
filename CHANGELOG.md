@@ -4,6 +4,23 @@ All notable changes to the ProteinTracker project will be documented in this fil
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-10-20
+
+### Added
+- **Exact Completion Timestamps**: Finishing a day now stores the exact time when "Finish Day" is triggered (e.g. `17. Oktober 00:02`), allowing multiple day completions on the same calendar day.
+- **Centered Multi-line Chart Labels**: The progress chart now displays two-line, centered labels showing the full date on top and the completion time underneath (e.g. `16. Oktober 2026` / `23:50`).
+- **Backwards Compatibility**: Existing records in `localStorage` without a timestamp are preserved and displayed on the chart with `00:00`.
+- **Separate Web and App Icons**: Integrated transparent logo (`assets/logo.png`) for website header and browser favicon, and solid non-transparent icon (`assets/apple-touch-icon.png` and `manifest.json`) for mobile home-screen app installs.
+
+### Changed
+- **Expanded Date Container**: Enlarged the top summary card container to ensure the full date name and intake status are completely visible on all mobile screens without clipping.
+- **Finish Day Button**: Standardized the action button text to "Finish Day".
+
+### Removed
+- **Day Rollover Banner**: Removed the date-change archive notification banner to streamline the logging flow.
+
+---
+
 ## [1.1.0] - 2026-10-09
 
 ### Added
