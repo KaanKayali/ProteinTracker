@@ -8,18 +8,86 @@
 html {
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
-    font-size: 17px; /* Globally enlarges all typography across mobile & desktop */
+    touch-action: manipulation;
+    font-size: 14px;
 }
 
 @media (min-width: 640px) {
     html {
-        font-size: 18px; /* Extra spacious and comfortable scaling on laptop/desktop */
+        font-size: 14px;
     }
 }
 
 body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@media (max-width: 639px) {
+    .mobile-safe-header {
+        padding-top: max(0.75rem, env(safe-area-inset-top));
+    }
+}
+
+.mobile-bottom-nav {
+    display: flex;
+    justify-content: center;
+    background: transparent !important;
+}
+
+html:not(.dark) .mobile-bottom-nav {
+    background: transparent !important;
+}
+
+.mobile-tab-dock {
+    width: min(76vw, 22rem);
+    border: 1px solid rgba(148, 155, 164, 0.13);
+    padding: 0.35rem;
+    background: rgba(39, 41, 47, 0.94);
+    backdrop-filter: blur(22px);
+}
+
+.mobile-tab-button {
+    min-height: 3.6rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.18rem;
+    border-radius: 999px;
+    color: #949ba4;
+    transition: background-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.mobile-tab-button:active {
+    transform: scale(0.97);
+}
+
+.settings-chevron-open {
+    transform: rotate(180deg);
+}
+
+.mobile-tab-button.is-active {
+    color: #d9c7e8;
+    background: rgba(176, 150, 196, 0.2);
+}
+
+html:not(.dark) .mobile-tab-button {
+    color: #475569;
+}
+
+html:not(.dark) .mobile-tab-dock {
+    background: rgba(242, 245, 249, 0.94);
+    border-color: rgba(71, 85, 105, 0.12);
+}
+
+html:not(.dark) .mobile-tab-button.is-active {
+    color: #5e4871;
+    background: rgba(154, 128, 178, 0.18);
+}
+
+html:not(.dark) .profile-settings-title {
+    color: #0f172a !important;
 }
 
 /* Keypad tactile feedback without glow */

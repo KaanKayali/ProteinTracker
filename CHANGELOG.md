@@ -4,6 +4,14 @@ All notable changes to the ProteinTracker project will be documented in this fil
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-10-20
+
+### Changed
+- Updated the Finish Day action color and localized its label for German browsers.
+- Refined the mobile tab navigation and slightly reduced global typography.
+- Split application JavaScript into modules organized by responsibility.
+- Added a saved German/English language preference.
+
 ## [1.2.0] - 2026-10-20
 
 ### Added

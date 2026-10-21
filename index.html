@@ -89,7 +89,7 @@
 <body class="bg-dark-bg text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-brand-500 selection:text-white transition-colors duration-200">
 
     <!-- Header Navbar -->
-    <header class="sticky top-0 z-40 bg-dark-card/90 backdrop-blur-md transition-colors duration-200">
+    <header class="mobile-safe-header sticky top-0 z-40 bg-dark-card/90 backdrop-blur-md transition-colors duration-200">
         <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
             <!-- Brand header with responsive larger logo & title and author credit -->
             <div class="flex items-center space-x-3 flex-shrink min-w-max">
@@ -97,7 +97,7 @@
                 <div class="flex flex-col justify-center">
                     <div class="flex items-center gap-2">
                         <h1 class="font-black text-xl sm:text-2xl tracking-tight leading-none whitespace-nowrap text-white">ProteinTracker</h1>
-                        <span class="text-xs sm:text-sm font-bold px-2 py-0.5 rounded-lg bg-brand-500/15 text-brand-400 whitespace-nowrap">v1.2.0</span>
+                        <span class="text-xs sm:text-sm font-bold px-2 py-0.5 rounded-lg bg-brand-500/15 text-brand-400 whitespace-nowrap">v1.3.0</span>
                     </div>
                     <span class="text-xs sm:text-sm text-dark-textMuted font-semibold tracking-normal mt-1 leading-none">@KaanKayali</span>
                 </div>
@@ -143,7 +143,7 @@
                     <!-- Left: Grams & Goal -->
                     <div class="min-w-0 flex-1 space-y-2">
                         <div class="flex items-baseline space-x-2">
-                            <span id="today-total" class="text-6xl sm:text-7xl md:text-8xl font-black tracking-tight leading-none text-white">0</span>
+                            <span id="today-total" class="text-5xl sm:text-6xl md:text-7xl font-black tracking-tight leading-none text-white">0</span>
                             <span class="text-2xl sm:text-3xl font-extrabold text-dark-textMuted">g</span>
                         </div>
                         <div class="flex items-center gap-2 pt-1">
@@ -155,7 +155,7 @@
                     </div>
 
                     <!-- Right: Enlarged Progress Circle -->
-                    <div class="relative w-28 h-28 sm:w-36 sm:h-36 flex-shrink-0">
+                    <div class="relative w-[7rem] h-[7rem] sm:w-[9rem] sm:h-[9rem] flex-shrink-0">
                         <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                             <path id="progress-circle-bg" class="text-dark-cardAlt" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                             <path id="progress-circle" class="text-brand-500 transition-all duration-300 ease-out" stroke-dasharray="0, 100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
@@ -169,9 +169,9 @@
 
                 <!-- Bottom: Full-Width Prominent Finish Day Button -->
                 <div class="pt-1">
-                    <button onclick="openFinishModal()" title="Finish Day" class="w-full flex items-center justify-center space-x-2.5 py-3.5 sm:py-4 px-6 bg-emerald-600 hover:bg-emerald-500 active:scale-[0.98] text-white text-base sm:text-lg font-extrabold rounded-2xl transition-all shadow-none">
+                    <button id="finish-day-button" onclick="openFinishModal()" title="Finish Day" class="w-full flex items-center justify-center space-x-2.5 py-3.5 sm:py-4 px-6 bg-brand-700 hover:bg-brand-600 active:scale-[0.98] text-white text-base sm:text-lg font-extrabold rounded-2xl transition-all shadow-none">
                         <i class="fa-solid fa-flag-checkered text-lg"></i>
-                        <span>Finish Day & Speichern</span>
+                        <span id="finish-day-label">Finish Day & Save</span>
                     </button>
                 </div>
             </div>
@@ -297,15 +297,21 @@
             </div>
 
             <!-- Integrated Settings in Profile -->
-            <div class="bg-dark-card rounded-3xl p-5 sm:p-7 shadow-none space-y-6 transition-colors duration-200">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-2.5">
+            <div class="bg-dark-card rounded-3xl p-5 sm:p-7 shadow-none transition-colors duration-200">
+                <button id="profile-settings-toggle" type="button" onclick="toggleProfileSettings()" aria-expanded="false" aria-controls="profile-settings-panel" class="w-full flex items-center justify-between gap-4 text-left shadow-none">
+                    <div class="flex items-center space-x-3 min-w-0">
                         <div class="w-10 h-10 rounded-xl bg-brand-500/15 text-brand-400 flex items-center justify-center text-base font-bold">
                             <i class="fa-solid fa-sliders"></i>
                         </div>
-                        <h3 class="text-base sm:text-lg font-black text-white">Einstellungen</h3>
+                        <div class="min-w-0">
+                            <span class="profile-settings-title block text-base sm:text-lg font-black text-white">Einstellungen</span>
+                            <p class="text-xs sm:text-sm text-dark-textMuted mt-0.5">Ziel, Design, Backup & Verlauf</p>
+                        </div>
                     </div>
-                </div>
+                    <i id="profile-settings-chevron" class="fa-solid fa-chevron-down text-dark-textMuted text-sm transition-transform duration-200"></i>
+                </button>
+
+                <div id="profile-settings-panel" class="hidden pt-5 space-y-6">
 
                 <!-- Appearance Theme Toggle (Light / Dark mode) -->
                 <div class="space-y-2.5">
@@ -320,6 +326,16 @@
                             <span>Light Mode</span>
                         </button>
                     </div>
+                </div>
+
+                <hr>
+
+                <div class="space-y-2.5">
+                    <h4 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-dark-textMuted">Sprache</h4>
+                    <select id="language-select" onchange="setAppLanguage(this.value)" class="w-full bg-dark-input rounded-2xl px-4 py-3 text-sm font-bold text-white outline-none shadow-none">
+                        <option value="de">Deutsch</option>
+                        <option value="en">English</option>
+                    </select>
                 </div>
 
                 <hr>
@@ -370,21 +386,22 @@
                         Alle Verlaufsdaten löschen
                     </button>
                 </div>
+                </div>
             </div>
         </div>
 
     </main>
 
     <!-- Mobile Bottom Navigation Bar (iOS / Mobile First Navigation) -->
-    <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-dark-card/95 backdrop-blur-lg px-6 py-2.5 transition-colors duration-200" style="padding-bottom: max(0.6rem, env(safe-area-inset-bottom));">
-        <div class="flex items-center justify-around max-w-sm mx-auto">
-            <button id="nav-mobile-tracker" onclick="switchTab('tracker')" class="flex flex-col items-center justify-center py-1 px-4 text-brand-400 transition-colors shadow-none">
-                <i class="fa-solid fa-plus-circle text-xl sm:text-2xl mb-1"></i>
-                <span class="text-xs sm:text-sm font-bold">Tracking</span>
+    <nav class="mobile-bottom-nav sm:hidden fixed bottom-0 left-0 right-0 z-40 px-4 transition-colors duration-200" style="padding-top: 0.25rem; padding-bottom: max(0.01rem, calc(env(safe-area-inset-bottom, 0px) - 1rem));" aria-label="Hauptnavigation">
+        <div id="mobile-nav-dock" class="mobile-tab-dock max-w-sm mx-auto grid grid-cols-2 gap-1 p-1.5 bg-dark-cardAlt rounded-full">
+            <button id="nav-mobile-tracker" onclick="switchTab('tracker')" aria-pressed="true" class="mobile-tab-button is-active">
+                <i class="fa-solid fa-chart-simple text-lg"></i>
+                <span class="text-xs font-bold">Tracking</span>
             </button>
-            <button id="nav-mobile-profile" onclick="switchTab('profile')" class="flex flex-col items-center justify-center py-1 px-4 text-dark-textMuted hover:text-white transition-colors shadow-none">
-                <i class="fa-solid fa-user text-xl sm:text-2xl mb-1"></i>
-                <span class="text-xs sm:text-sm font-semibold">Profil</span>
+            <button id="nav-mobile-profile" onclick="switchTab('profile')" aria-pressed="false" class="mobile-tab-button">
+                <i class="fa-regular fa-user text-lg"></i>
+                <span class="text-xs font-semibold">Profil</span>
             </button>
         </div>
     </nav>
@@ -392,7 +409,7 @@
     <!-- Modal: Finish day confirmation -->
     <div id="finish-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
         <div class="bg-dark-card rounded-3xl p-6 sm:p-8 max-w-sm w-full space-y-5 shadow-none animate-in fade-in zoom-in duration-200">
-            <div class="w-14 h-14 rounded-full bg-emerald-500/15 text-emerald-400 flex items-center justify-center mx-auto text-2xl">
+            <div class="w-14 h-14 rounded-full bg-brand-500/15 text-brand-400 flex items-center justify-center mx-auto text-2xl">
                 <i class="fa-solid fa-flag-checkered"></i>
             </div>
             <div class="text-center space-y-2">
@@ -401,11 +418,16 @@
             </div>
             <div class="flex gap-2.5 pt-2">
                 <button onclick="closeFinishModal()" class="flex-1 px-4 py-3 sm:py-3.5 rounded-2xl bg-dark-cardAlt hover:bg-dark-border text-dark-textMuted hover:text-white text-xs sm:text-sm font-bold transition-all shadow-none">Abbrechen</button>
-                <button onclick="confirmFinishDay()" class="flex-1 px-4 py-3 sm:py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-extrabold transition-all shadow-none">Ja, Beenden</button>
+                <button onclick="confirmFinishDay()" class="flex-1 px-4 py-3 sm:py-3.5 rounded-2xl bg-brand-700 hover:bg-brand-600 text-white text-xs sm:text-sm font-extrabold transition-all shadow-none">Ja, Beenden</button>
             </div>
         </div>
     </div>
 
+    <script src="js/i18n.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/tracker.js"></script>
+    <script src="js/stats.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/backup.js"></script>
 </body>
 </html>
