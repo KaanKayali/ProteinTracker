@@ -1,82 +1,30 @@
 # ProteinTracker
 
-ProteinTracker is a lightweight, responsive client-side web application built for logging and monitoring daily protein consumption. It offers numeric logging, an on-screen keypad for touch devices, daily goal tracking, and a historical chart.
+Log your protein intake and see how you are progressing toward your daily goal.
 
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white)
-![CSS3](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-38B2AC?style=flat-square&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
-![Chart.js](https://img.shields.io/badge/Chart.js-FF6384?style=flat-square&logo=chartdotjs&logoColor=white)
+![Chart.js](https://img.shields.io/badge/Charts-FF6384?style=flat-square&logo=chartdotjs&logoColor=white)
 
-## Overview
 
-The application runs entirely in the browser using static files. It requires no backend server or account authentication. State is persisted locally on the client using the browser's `localStorage` API.
+## Use it on your phone
 
-## Features
+You can add it to your home screen for an app-like shortcut:
 
-- **Fast Entry Logging**: Log intake via direct keyboard entry, quick-add preset buttons (+10g, +20g, +25g, +30g, +50g), or the built-in numeric touch keypad.
-- **Persistent Daily Goal**: Configure your daily target in settings. The value remains active until modified.
-- **German and English UI**: Choose the app language in profile settings; the selection is saved on the device.
-- **Data Export & Import**: Backup and restore your complete tracking history as a portable JSON file directly from the settings panel.
-- **Progress Tracking**: A dynamic radial progress ring provides immediate visual feedback against your daily target.
-- **Daily Entries Stream**: View, verify, and delete individual log entries for the current day.
-- **Day Archival**: Finalize and close out your daily log to store totals in your history and reset the current day's counter.
-- **Historical Analytics**: Review past intake with 7-day rolling averages, all-time record metrics, and interactive bar or line charts powered by Chart.js.
+- **iPhone:** Tap **Share**, then **Add to Home Screen**.
+- **Android:** Open the browser menu and choose **Install app** or **Add to Home screen**.
 
-## Project Structure
+The exact wording may vary slightly by browser.
 
-```text
-ProteinTracker/
-├── assets/
-│   └── logo.png       Application icon and favicon
-├── css/
-│   └── style.css      Custom styles and scrollbar overrides
-├── js/
-│   ├── app.js         App state, storage, theme, and startup
-│   ├── i18n.js        German and English translations
-│   ├── tracker.js     Protein entry and finish-day actions
-│   ├── stats.js       Statistics and chart rendering
-│   ├── navigation.js  Tabs and daily target settings
-│   └── backup.js      Data import and export
-├── .gitignore         Git ignore definitions
-├── CHANGELOG.md       Version history and changes
-├── index.html         Main HTML document and user interface
-└── README.md          Project documentation
-```
+## Usage
+- Enter an amount or use the quick-add buttons, or tap the on-screen keypad on your phone.
+- Set a daily target and see your total.
+- Press on "Save and finish day" to reset the protein counter and store the previous day in the local storage.
+- Review previous days with a simple bar/linear chart.
 
-## Running the Application Locally
+## Your data
 
-Since this is a static project, you can run it by opening `index.html` directly in any modern browser.
+Your logs and settings are saved in your browser on your device. They are not linked to an account and do not sync automatically between devices. Use **Profile → Settings → Export** to keep a backup before clearing browser data or moving to another device; use **Import** to restore it.
 
-Alternatively, you can start a local development server:
-
-```bash
-# Using Python 3
-python -m http.server 8000
-
-# Using Node.js
-npx serve .
-```
-
-Once running, navigate to `http://localhost:8000` in your web browser.
-
-## Deployment to GitHub Pages
-
-To host the application using GitHub Pages:
-
-1. Commit and push your changes to your remote repository on GitHub:
-   ```bash
-   git add .
-   git commit -m "Release v1.1.0: responsive nav, day rollover safeguard, backup import/export"
-   git push origin main
-   ```
-
-2. Open your repository on GitHub in a web browser.
-3. Click on the **Settings** tab.
-4. In the left sidebar, navigate to the **Pages** section.
-5. Under **Build and deployment**:
-   - Source: **Deploy from a branch**
-   - Branch: Select `main` (or `master`) and leave the directory set to `/ (root)`.
-6. Click **Save**.
-
-GitHub Pages will build and deploy the application. Within a few moments, your site will be live at:
-`https://<username>.github.io/<repository-name>/`
+The app itself does not need a server or account. It does load some visual and charting resources from online services, so an internet connection is needed to load the full interface.
