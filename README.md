@@ -13,9 +13,9 @@ The application runs entirely in the browser using static files. It requires no 
 
 ## Features
 
-- **Fast Entry Logging**: Log intake via direct keyboard entry, quick-add preset buttons (+10g, +25g, +30g, +50g), or the built-in numeric touch keypad.
-- **Persistent Daily Goal**: Configure your daily target via the settings modal. The value remains active until modified.
-- **Day Rollover Protection**: Opening the app on a new calendar day never discards unfinalized protein logs. The app informs the user with an intuitive banner, allowing past logs to be archived to yesterday's history or carried into today's active total.
+- **Fast Entry Logging**: Log intake via direct keyboard entry, quick-add preset buttons (+10g, +20g, +25g, +30g, +50g), or the built-in numeric touch keypad.
+- **Persistent Daily Goal**: Configure your daily target in settings. The value remains active until modified.
+- **German and English UI**: Choose the app language in profile settings; the selection is saved on the device.
 - **Data Export & Import**: Backup and restore your complete tracking history as a portable JSON file directly from the settings panel.
 - **Progress Tracking**: A dynamic radial progress ring provides immediate visual feedback against your daily target.
 - **Daily Entries Stream**: View, verify, and delete individual log entries for the current day.
@@ -31,7 +31,12 @@ ProteinTracker/
 ├── css/
 │   └── style.css      Custom styles and scrollbar overrides
 ├── js/
-│   └── app.js         Core state management, event listeners, and chart logic
+│   ├── app.js         App state, storage, theme, and startup
+│   ├── i18n.js        German and English translations
+│   ├── tracker.js     Protein entry and finish-day actions
+│   ├── stats.js       Statistics and chart rendering
+│   ├── navigation.js  Tabs and daily target settings
+│   └── backup.js      Data import and export
 ├── .gitignore         Git ignore definitions
 ├── CHANGELOG.md       Version history and changes
 ├── index.html         Main HTML document and user interface
